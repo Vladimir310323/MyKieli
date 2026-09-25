@@ -1,0 +1,1522 @@
+<!DOCTYPE html><html lang="ru"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Harmony Words</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:var(--tg-theme-bg-color,#F6EFFB);
+  --bg2:var(--tg-theme-secondary-bg-color,#EDE0F7);
+  --text:var(--tg-theme-text-color,#4A3A63);
+  --hint:var(--tg-theme-hint-color,#8C78A8);
+  --btn:var(--tg-theme-button-color,#7C5A9E);
+  --btnt:var(--tg-theme-button-text-color,#fff);
+  --ok:#22c55e;--no:#ef4444;--r:16px;
+  --gold:#C4A060;
+  --violet:#7C5A9E;
+  --lavender:#F0E6FA;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow:hidden}
+.sc{display:none;flex-direction:column;height:100%;overflow:hidden}
+.sc.on{display:flex}
+/* Loader */
+#sl{align-items:center;justify-content:center}
+.spin{width:40px;height:40px;border:4px solid var(--bg2);border-top-color:var(--btn);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Common */
+.screen-head{display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,0px),12px) 20px 12px;flex-shrink:0}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;flex-shrink:0}
+.screen-title{font-size:17px;font-weight:700;flex:1}
+.btn-pri{width:100%;padding:16px;border-radius:var(--r);font-size:16px;font-weight:700;background:var(--btn);color:#fff;border:none;cursor:pointer}
+/* Onboarding */
+#sob{padding:0 20px;overflow-y:auto;gap:0}
+.ob-step{display:none;flex-direction:column;padding:32px 0;gap:16px}
+.ob-step.on{display:flex}
+.ob-logo{font-size:52px;text-align:center}
+.ob-h{font-size:26px;font-weight:800;text-align:center}
+.ob-sub{font-size:14px;color:var(--hint);text-align:center}
+.ob-q{font-size:15px;font-weight:700;color:var(--text);text-align:center}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lang-tile{padding:16px 12px;border-radius:var(--r);background:var(--bg2);border:2px solid transparent;cursor:pointer;text-align:center;transition:all .15s}
+.lang-tile.sel{border-color:var(--btn);background:rgba(124,90,158,.1)}
+.lang-tile.dim{opacity:.35}
+.lang-tile .em{font-size:28px;margin-bottom:4px}
+.lang-tile .nm{font-size:13px;font-weight:700}
+.lang-tile .sub{font-size:11px;color:var(--hint)}
+.goal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.goal-tile{padding:14px 8px;border-radius:var(--r);background:var(--bg2);border:2px solid transparent;cursor:pointer;text-align:center;transition:all .15s}
+.goal-tile.sel{border-color:var(--btn);background:rgba(124,90,158,.1)}
+.goal-tile .gn{font-size:24px;font-weight:800}
+.goal-tile .gl{font-size:11px;color:var(--hint);margin-top:2px}
+/* Home */
+#shome{overflow:hidden}
+.home-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:max(env(safe-area-inset-top,0px),16px) 20px 12px;flex-shrink:0}
+.home-greet{font-size:22px;font-weight:800}
+.home-date-row{display:flex;align-items:center;gap:8px;margin-top:2px}
+.home-date{font-size:13px;color:var(--hint)}
+.home-streak{font-size:12px;font-weight:700;color:var(--gold)}
+.gear-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0}
+.home-prog-wrap{padding:0 20px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.home-prog-bar{flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.home-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),#9B6CC4);border-radius:3px;transition:width .5s}
+.home-prog-lbl{font-size:12px;color:var(--hint);white-space:nowrap}
+.home-lang-row{display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.home-lang-row::-webkit-scrollbar{display:none}
+.lang-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;background:var(--bg2);color:var(--hint);border:none;cursor:pointer}
+.lang-tab.act{background:var(--btn);color:#fff}
+.home-counts{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;padding:0 20px 16px;flex-shrink:0}
+.hc-item{text-align:center}
+.hc-n{font-size:30px;font-weight:800;line-height:1}
+.hc-l{font-size:11px;color:var(--hint);margin-top:3px}
+.hc-div{width:1px;height:36px;background:var(--bg2);margin:0 4px}
+.home-main{flex:1;display:flex;flex-direction:column;padding:0 20px max(env(safe-area-inset-bottom,0px),24px);gap:10px;overflow:hidden}
+.start-btn{width:100%;padding:17px;border-radius:var(--r);font-size:16px;font-weight:800;background:var(--violet);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;animation:startPulse 3s ease-in-out infinite}
+.start-btn:disabled{opacity:.4;animation:none;background:var(--btn)}
+.start-cnt{background:rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:13px}
+.err-btn{background:var(--bg2);color:var(--text);font-size:14px}
+.home-next{font-size:12px;color:var(--hint);text-align:center;min-height:16px}
+.hl{width:100%;padding:12px;border-radius:var(--r);background:var(--bg2);border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--text)}
+/* Study header */
+.study-hdr{display:flex;align-items:center;gap:10px;padding:max(env(safe-area-inset-top,0px),10px) 16px 10px;flex-shrink:0}
+.study-track{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.study-fill{height:100%;background:var(--btn);border-radius:2px;transition:width .3s}
+.study-cnt{font-size:12px;color:var(--hint);flex-shrink:0}
+.ses-badge{font-size:18px;flex-shrink:0}
+/* Acquaintance */
+.acq-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.acq-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--hint);margin-bottom:16px}
+.acq-card{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:24px;padding:32px 28px;box-shadow:0 4px 28px rgba(124,90,158,.2);border:1px solid rgba(196,160,96,.2);border-top:3px solid var(--gold);text-align:center;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.acq-flag{display:none}
+.acq-word{font-size:38px;font-weight:700;line-height:1.15;color:var(--text);font-family:'Cormorant Garamond',serif}
+.acq-word-b{color:var(--violet);font-family:'Cormorant Garamond',serif}
+.acq-eq{font-size:22px;color:var(--hint)}
+.acq-hint{display:none}
+.acq-btn-wrap{padding:16px 20px max(env(safe-area-inset-bottom,0px),24px);flex-shrink:0}
+/* Timer */
+.timer-bar{height:4px;background:var(--bg2);flex-shrink:0}
+.timer-fill{height:100%;background:var(--btn);transition:width 5s linear}
+/* MCQ */
+.mcq-wrap{flex:1;display:flex;flex-direction:column;padding:14px 20px;gap:12px;overflow:hidden}
+.mcq-dir{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.5px}
+.mcq-q{font-size:42px;font-weight:700;line-height:1.15;font-family:'Cormorant Garamond',serif;flex:1;display:flex;align-items:center}
+.mcq-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:max(env(safe-area-inset-bottom,0px),8px)}
+.mcq-btn{padding:15px 8px;border-radius:var(--r);border:2px solid var(--bg2);background:rgba(255,255,255,.7);backdrop-filter:blur(6px);font-size:14px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s}
+.mcq-btn.ok{border-color:var(--ok);background:#dcfce7;color:#166534;animation:correctPop .35s ease}
+.mcq-btn.no{border-color:var(--no);background:#fee2e2;color:var(--no);animation:wrongShake .3s ease}
+/* Spell */
+.spell-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;gap:18px}
+.spell-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--hint)}
+.spell-nat{font-size:28px;font-weight:800;text-align:center;line-height:1.3}
+.spell-slots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.spell-slot{min-width:40px;height:48px;padding:0 6px;border-radius:10px;background:var(--bg2);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--hint);transition:all .15s}
+.spell-slot.filled{background:#fff;border-color:var(--btn);color:var(--btn);cursor:pointer}
+.spell-slot.win{background:#dcfce7;border-color:var(--ok);color:#166534}
+
+@keyframes shake{0%,100%{transform:none}25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.spell-slots.shake{animation:shake .35s}
+.spell-tiles{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;max-width:320px}
+.spell-tile{min-width:40px;height:48px;padding:0 8px;border-radius:10px;background:#fff;border:2px solid var(--bg2);font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08);transition:transform .1s,opacity .15s}
+.spell-tile:active{transform:scale(.9)}
+.spell-tile.used{opacity:0;pointer-events:none}
+
+.spell-hint{font-size:14px;font-weight:700;color:var(--btn);min-height:20px;text-align:center}
+/* Done */
+#sdone{overflow-y:auto}
+.done-top{display:flex;flex-direction:column;align-items:center;padding:24px 20px 12px;gap:5px}
+.done-em{font-size:56px}
+.done-h{font-size:22px;font-weight:800}
+.done-sub{font-size:13px;color:var(--hint)}
+.done-counts{display:flex;gap:10px;padding:0 20px 12px}
+.done-stat{flex:1;border-radius:var(--r);text-align:center;padding:12px}
+.ds-ok{background:#dcfce7}.ds-no{background:#fee2e2}
+.done-stat .dn{font-size:26px;font-weight:800}
+.done-stat .dl{font-size:11px;color:var(--hint);margin-top:2px}
+.done-sec{padding:0 20px 10px}
+.done-sec-h{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.done-words{display:flex;flex-wrap:wrap;gap:5px}
+.done-word{padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;background:#dcfce7;color:#166534}
+.done-errs{display:flex;flex-direction:column;gap:5px}
+.done-err{background:var(--bg2);border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px;font-size:13px}
+.done-err .er{font-weight:700;flex:1}.done-err .ea{color:var(--hint)}.done-err .et{color:var(--btn);font-weight:700}
+.done-hard{margin:0 20px 10px;background:rgba(124,90,158,.09);border-radius:var(--r);padding:11px 14px;font-size:14px;font-weight:700;color:var(--violet);text-align:center}
+.done-foot{padding:0 20px max(env(safe-area-inset-bottom,0px),24px)}
+/* Vocabulary */
+#svocab{overflow-y:auto}
+.vocab-search-wrap{padding:4px 20px 6px}
+.vocab-search{width:100%;padding:9px 12px;border-radius:var(--r);border:1.5px solid var(--bg2);background:var(--bg2);font-size:14px;color:var(--text);outline:none}
+.vocab-search:focus{border-color:var(--btn)}
+.vocab-filters{display:flex;gap:6px;padding:0 20px 6px}
+.vf-btn{padding:5px 13px;border-radius:18px;font-size:13px;font-weight:700;background:var(--bg2);color:var(--hint);border:none;cursor:pointer}
+.vf-btn.act{background:var(--btn);color:#fff}
+.vocab-cats{display:flex;gap:5px;padding:0 20px 6px;overflow-x:auto;scrollbar-width:none}
+.vocab-cats::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;padding:4px 9px;border-radius:12px;font-size:11px;font-weight:700;background:var(--bg2);color:var(--hint);border:1.5px solid transparent;cursor:pointer;white-space:nowrap}
+.cat-btn.act{border-color:var(--btn);color:var(--btn)}
+.vocab-list{padding:0 20px 32px}
+.vocab-cat-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0 4px}
+.vch-t{font-size:11px;font-weight:700;color:var(--hint)}
+.vch-c{font-weight:400}
+.cat-chk-wrap{display:flex;align-items:center;gap:4px;cursor:pointer}
+.cat-chk-lbl{font-size:11px;color:var(--btn);font-weight:700}
+.vi-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--bg2)}
+.vi-word{font-size:14px;font-weight:700;flex:1;min-width:0}
+.vi-eq{font-size:12px;color:var(--hint);flex-shrink:0}
+.vi-tr{font-size:14px;color:var(--btn);font-weight:600;flex:1;min-width:0}
+.vi-chk{width:20px;height:20px;accent-color:var(--btn);cursor:pointer;flex-shrink:0}
+.vocab-empty{padding:40px 0;text-align:center;color:var(--hint)}
+/* Settings */
+#sset{overflow-y:auto}
+.set-sec{display:flex;flex-direction:column;gap:8px;padding:0 20px 20px}
+.set-lbl{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.6px}
+.topic-row{display:flex;gap:8px}
+.topic-btn{flex:1;padding:10px;border-radius:var(--r);border:2px solid var(--bg2);background:var(--bg2);font-size:13px;font-weight:700;cursor:pointer;color:var(--hint)}
+.topic-btn.act{border-color:var(--btn);background:rgba(124,90,158,.1);color:var(--btn)}
+.topic-now{font-size:12px;color:var(--hint);min-height:16px}
+.set-langs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slt{padding:10px 4px;border-radius:var(--r);border:2px solid transparent;background:var(--bg2);font-size:20px;cursor:pointer;text-align:center}
+.slt .snm{font-size:10px;font-weight:700;color:var(--hint);margin-top:2px}
+.slt.act{border-color:var(--btn)}
+.set-act-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.sat-btn{padding:7px 12px;border-radius:18px;font-size:12px;font-weight:700;background:var(--bg2);color:var(--hint);border:none;cursor:pointer}
+.sat-btn.act{background:var(--btn);color:#fff}
+.set-divider{height:1px;background:var(--bg2);margin:0 20px}
+.set-footer{padding:20px 20px 40px;font-size:11px;color:var(--hint);text-align:center}
+.set-danger{color:var(--no);cursor:pointer;text-decoration:underline}
+/* Reset dialog */
+#reset-dlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center;padding:20px}
+.reset-card{background:var(--bg);border-radius:20px;padding:24px 20px;width:100%;max-width:340px}
+.reset-card h3{font-size:17px;font-weight:800;margin-bottom:8px}
+.reset-card p{font-size:14px;color:var(--hint);margin-bottom:20px}
+.reset-btns{display:flex;gap:10px}
+.reset-btns button{flex:1;padding:13px;border-radius:var(--r);border:none;font-size:14px;font-weight:700;cursor:pointer}
+/* Vocab warn */
+#vocab-warn{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:flex-end}
+.warn-card{background:var(--bg);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%}
+
+/* Brand bar */
+.brand-bar{display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,0px),12px) 20px 0;flex-shrink:0}
+.brand-bar-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.brand-bar-text{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap;font-family:'Manrope',sans-serif}
+/* Gold icon unicode symbols */
+.ico{color:var(--gold);font-style:normal;font-family:'Manrope',sans-serif}
+/* Bigger text overrides */
+.ob-h{font-size:26px;font-weight:800;text-align:center}
+.home-greet{font-size:22px;font-weight:800}
+.hc-n{font-size:36px;font-weight:800;line-height:1}
+.done-h{font-size:26px;font-weight:800}
+.done-em{font-size:52px;color:var(--gold);font-family:'Manrope',sans-serif;line-height:1}
+/* Spell slot colors aligned with theme */
+.spell-slot.filled{background:#fff;border-color:var(--violet);color:var(--violet);cursor:pointer}
+.spell-hint{font-size:14px;font-weight:700;color:var(--violet);min-height:20px;text-align:center}
+/* Category separator */
+.vi-row+.vocab-cat-hdr{border-top:1px solid var(--bg2);margin-top:4px;padding-top:14px}
+/* Animations */
+@keyframes startPulse{
+  0%,100%{box-shadow:0 4px 20px rgba(124,90,158,.25),0 0 0 0 rgba(196,160,96,0)}
+  50%{box-shadow:0 6px 32px rgba(124,90,158,.4),0 0 0 4px rgba(196,160,96,.18)}
+}
+@keyframes correctPop{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}33%{transform:translateX(-3px)}66%{transform:translateX(3px)}}
+
+/* ── DARK THEME OVERRIDES ── */
+[data-theme="dark"] .acq-card{background:rgba(40,28,65,.92);border-color:rgba(196,160,96,.3);box-shadow:0 4px 28px rgba(0,0,0,.4)}
+[data-theme="dark"] .mcq-btn{background:rgba(255,255,255,.07);color:var(--text);border-color:rgba(255,255,255,.12)}
+[data-theme="dark"] .mcq-btn.ok{background:rgba(34,197,94,.18);color:#4ade80;border-color:#22c55e}
+[data-theme="dark"] .mcq-btn.no{background:rgba(239,68,68,.18);color:#f87171;border-color:#ef4444}
+[data-theme="dark"] .spell-slot.filled{background:rgba(124,90,158,.3);border-color:var(--violet);color:#c4a8e8}
+[data-theme="dark"] .spell-slot.win{background:rgba(34,197,94,.2);border-color:#22c55e;color:#4ade80}
+[data-theme="dark"] .spell-tile{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:var(--text);box-shadow:none}
+[data-theme="dark"] .ds-ok{background:rgba(34,197,94,.15)}
+[data-theme="dark"] .ds-no{background:rgba(239,68,68,.15)}
+[data-theme="dark"] .done-word{background:rgba(34,197,94,.15);color:#4ade80}
+[data-theme="dark"] .done-stat .dn,[data-theme="dark"] .done-stat .dl{color:var(--text)}
+[data-theme="dark"] .reset-card{background:var(--bg)}
+[data-theme="dark"] .warn-card{background:var(--bg)}
+[data-theme="dark"] .lang-tile.sel{background:rgba(124,90,158,.2)}
+[data-theme="dark"] .goal-tile.sel{background:rgba(124,90,158,.2)}
+</style>
+</head>
+<body>
+<div id="sl" class="sc on"><div class="spin"></div></div>
+
+<!-- ONBOARDING -->
+<div id="sob" class="sc">
+<div id="ob1" class="ob-step on">
+  <div class="ob-logo">🌟</div>
+  <div class="ob-h">Harmony Words</div>
+  <div class="ob-sub" id="ob-sub">409 слов · финский · английский · украинский · русский</div>
+  <div class="ob-q" id="ob-q">На каком языке вы хорошо говорите?</div>
+  <div class="lang-grid">
+    <div class="lang-tile" id="lt-ru" onclick="pickNat('ru')"><div class="em">🇷🇺</div><div class="nm">Русский</div></div>
+    <div class="lang-tile" id="lt-uk" onclick="pickNat('uk')"><div class="em">🇺🇦</div><div class="nm">Українська</div></div>
+    <div class="lang-tile" id="lt-en" onclick="pickNat('en')"><div class="em">🇬🇧</div><div class="nm">English</div></div>
+    <div class="lang-tile" id="lt-fi" onclick="pickNat('fi')"><div class="em">🇫🇮</div><div class="nm">Suomi</div></div>
+  </div>
+  <button class="btn-pri" id="btn-ob1" onclick="goOb(2)" disabled>Далее →</button>
+</div>
+<div id="ob2" class="ob-step">
+  <div class="ob-sub" id="ob2-tag">Шаг 2 из 3</div>
+  <div class="ob-h" id="ob2-h">Что хотите выучить?</div>
+  <div class="lang-grid">
+    <div class="lang-tile" id="tl-fi" onclick="pickTgt('fi')"><div class="em">🇫🇮</div><div class="nm">Suomi</div><div class="sub">финский</div></div>
+    <div class="lang-tile" id="tl-en" onclick="pickTgt('en')"><div class="em">🇬🇧</div><div class="nm">English</div><div class="sub">английский</div></div>
+    <div class="lang-tile" id="tl-uk" onclick="pickTgt('uk')"><div class="em">🇺🇦</div><div class="nm">Українська</div><div class="sub">украинский</div></div>
+    <div class="lang-tile" id="tl-ru" onclick="pickTgt('ru')"><div class="em">🇷🇺</div><div class="nm">Русский</div><div class="sub">русский</div></div>
+  </div>
+  <button class="btn-pri" id="btn-ob2" onclick="goOb(3)" disabled>Далее →</button>
+</div>
+<div id="ob3" class="ob-step">
+  <div class="ob-sub" id="ob3-tag">Шаг 3 из 3</div>
+  <div class="ob-h" id="ob3-h">Сколько слов за раз?</div>
+  <div class="goal-grid">
+    <div class="goal-tile" id="gl-5"  onclick="pickGoal(5)"> <div class="gn">5</div><div class="gl">легко</div></div>
+    <div class="goal-tile sel" id="gl-10" onclick="pickGoal(10)"><div class="gn">10</div><div class="gl">норм</div></div>
+    <div class="goal-tile" id="gl-15" onclick="pickGoal(15)"><div class="gn">15</div><div class="gl">активно</div></div>
+    <div class="goal-tile" id="gl-20" onclick="pickGoal(20)"><div class="gn">20</div><div class="gl">интенс.</div></div>
+  </div>
+  <button class="btn-pri" id="btn-ob3" onclick="finishOb()">Начать →</button>
+</div>
+</div>
+
+<!-- HOME -->
+<div id="shome" class="sc">
+  <div class="brand-bar">
+    <div class="brand-bar-line"></div>
+    <span class="brand-bar-text">✦ Harmony Life ry ✦</span>
+    <div class="brand-bar-line"></div>
+  </div>
+  <div class="home-hdr">
+    <div>
+      <div class="home-greet" id="h-greet">Привет</div>
+      <div class="home-date-row">
+        <div class="home-date" id="h-date"></div>
+        <div class="home-streak" id="h-streak"></div>
+      </div>
+    </div>
+    <button class="gear-btn" onclick="openSettings()"><i class="ico">≡</i></button>
+  </div>
+  <div class="home-prog-wrap">
+    <div class="home-prog-bar"><div class="home-prog-fill" id="hpb" style="width:0%"></div></div>
+    <div class="home-prog-lbl" id="hpb-lbl">0 / 409</div>
+  </div>
+  <div class="home-lang-row" id="h-langs"></div>
+  <div class="home-counts">
+    <div class="hc-item"><div class="hc-n" id="hc-new">0</div><div class="hc-l" id="hc-new-l">Новые</div></div>
+    <div class="hc-div"></div>
+    <div class="hc-item"><div class="hc-n" id="hc-lrn">0</div><div class="hc-l" id="hc-lrn-l">Учу</div></div>
+    <div class="hc-div"></div>
+    <div class="hc-item"><div class="hc-n" id="hc-kn">0</div><div class="hc-l" id="hc-kn-l">Знаю</div></div>
+  </div>
+  <div class="home-main">
+    <button class="start-btn" id="btn-start" onclick="startSession()">
+      <span id="start-lbl">Начать учёбу</span>
+      <span class="start-cnt" id="start-cnt" style="display:none"></span>
+    </button>
+    <div class="home-next" id="h-next"></div>
+    <button class="start-btn err-btn" id="btn-err" style="display:none" onclick="startErrors()">
+      <i class="ico">↻</i> <span id="err-lbl">Повторить ошибки</span>
+      <span class="start-cnt" id="err-cnt" style="background:rgba(0,0,0,.1)">0</span>
+    </button>
+    <button class="hl" onclick="openVocab()"><i class="ico">≡</i> <span id="h-vocab-lbl">Словарь</span></button>
+  </div>
+</div>
+
+<!-- ACQUAINTANCE -->
+<div id="sacq" class="sc">
+  <div class="study-hdr">
+    <button class="back-btn" onclick="backHome()">←</button>
+    <div class="study-track"><div class="study-fill" id="acq-fill" style="width:0%"></div></div>
+    <div class="study-cnt" id="acq-cnt"></div>
+    <div class="ses-badge"><i class="ico">◆</i></div>
+  </div>
+  <div class="acq-wrap">
+    <div class="acq-cat" id="acq-cat"></div>
+    <div class="acq-card">
+      <div class="acq-flag" id="acq-flag-n">🇷🇺</div>
+      <div class="acq-word" id="acq-nat"></div>
+      <div class="acq-eq">=</div>
+      <div class="acq-flag" id="acq-flag-a">🇫🇮</div>
+      <div class="acq-word acq-word-b" id="acq-act"></div>
+    </div>
+    <div class="acq-hint">Запомни это слово</div>
+  </div>
+  <div class="acq-btn-wrap">
+    <button class="btn-pri" id="acq-btn" onclick="acqNext()">Понятно, дальше →</button>
+  </div>
+</div>
+
+<!-- MCQ -->
+<div id="smcq" class="sc">
+  <div class="study-hdr">
+    <button class="back-btn" onclick="backHome()">←</button>
+    <div class="study-track"><div class="study-fill" id="mcq-fill" style="width:0%"></div></div>
+    <div class="study-cnt" id="mcq-cnt"></div>
+    <div class="ses-badge" id="mcq-badge"><i class="ico">?</i></div>
+  </div>
+  <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+  <div class="mcq-wrap">
+    <div class="mcq-dir" id="mcq-dir"></div>
+    <div class="mcq-q" id="mcq-q"></div>
+    <div class="mcq-choices" id="mcq-choices"></div>
+  </div>
+</div>
+
+<!-- SPELL -->
+<div id="sspell" class="sc">
+  <div class="study-hdr">
+    <button class="back-btn" onclick="backHome()">←</button>
+    <div class="study-track"><div class="study-fill" id="sp-fill" style="width:0%"></div></div>
+    <div class="study-cnt" id="sp-cnt"></div>
+    <div class="ses-badge"><i class="ico">✦</i></div>
+  </div>
+  <div class="spell-wrap">
+    <div class="spell-cat" id="sp-cat"></div>
+    <div class="spell-nat" id="sp-nat"></div>
+    <div class="spell-slots" id="sp-slots"></div>
+    <div class="spell-hint" id="sp-hint"></div>
+    <div class="spell-tiles" id="sp-tiles"></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="sdone" class="sc">
+  <div class="done-top">
+    <div class="done-em" id="done-em">🎉</div>
+    <div class="done-h" id="done-h"></div>
+    <div class="done-sub" id="done-sub"></div>
+  </div>
+  <div class="done-counts">
+    <div class="done-stat ds-ok"><div class="dn" id="done-ok-n">0</div><div class="dl" id="done-ok-l">Верно</div></div>
+    <div class="done-stat ds-no"><div class="dn" id="done-no-n">0</div><div class="dl" id="done-no-l">Ошибки</div></div>
+  </div>
+  <div id="done-hard" class="done-hard" style="display:none"></div>
+  <div class="done-sec" id="done-ok-sec">
+    <div class="done-sec-h" id="done-ok-h">Правильно</div>
+    <div class="done-words" id="done-ok-list"></div>
+  </div>
+  <div class="done-sec" id="done-no-sec">
+    <div class="done-sec-h" id="done-no-h">Завтра повторить</div>
+    <div class="done-errs" id="done-no-list"></div>
+  </div>
+  <div class="done-foot">
+    <button class="btn-pri" onclick="backHome()">← На главную</button>
+  </div>
+</div>
+
+<!-- VOCABULARY -->
+<div id="svocab" class="sc">
+  <div class="screen-head">
+    <button class="back-btn" onclick="backHome()">←</button>
+    <div class="screen-title" id="vocab-title">Словарь</div>
+    <div id="vocab-cnt" style="font-size:12px;color:var(--hint)"></div>
+  </div>
+  <div class="vocab-search-wrap">
+    <input type="text" id="vocab-srch" class="vocab-search" placeholder="🔍"
+      oninput="vSrch=this.value;renderVocab()">
+  </div>
+  <div class="vocab-filters">
+    <button class="vf-btn act" id="vf-all" onclick="setVF('all')">Все</button>
+    <button class="vf-btn" id="vf-new" onclick="setVF('new')">Новые</button>
+    <button class="vf-btn" id="vf-kn" onclick="setVF('known')">✓ Знаю</button>
+  </div>
+  <div class="vocab-cats" id="vocab-cats"></div>
+  <div class="vocab-list" id="vocab-list"></div>
+  <div id="vocab-warn" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:flex-end">
+    <div class="warn-card">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Отметить как выученное?</div>
+      <div style="font-size:14px;color:var(--hint);margin-bottom:18px">Слово выйдет из учёбы.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn-pri" onclick="warnOk(false)">Да, убрать</button>
+        <button style="padding:14px;border-radius:var(--r);border:none;background:var(--bg2);font-size:14px;font-weight:700;cursor:pointer;color:var(--btn)" onclick="warnOk(true)">Да, больше не спрашивать</button>
+        <button style="padding:10px;border-radius:var(--r);border:none;background:transparent;font-size:14px;cursor:pointer;color:var(--hint)" onclick="warnNo()">Нет</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="sset" class="sc">
+  <div class="screen-head">
+    <button class="back-btn" onclick="backHome()">←</button>
+    <div class="screen-title">Настройки</div>
+  </div>
+  <div class="set-sec">
+    <div class="set-lbl" id="set-lbl-goal">Слов за раз</div>
+    <div class="goal-grid">
+      <div class="goal-tile" id="sg-5"  onclick="setGoal(5)"> <div class="gn">5</div></div>
+      <div class="goal-tile" id="sg-10" onclick="setGoal(10)"><div class="gn">10</div></div>
+      <div class="goal-tile" id="sg-15" onclick="setGoal(15)"><div class="gn">15</div></div>
+      <div class="goal-tile" id="sg-20" onclick="setGoal(20)"><div class="gn">20</div></div>
+    </div>
+  </div>
+  <div class="set-sec">
+    <div class="set-lbl" id="set-lbl-topic">Тема навчання</div>
+    <div class="topic-row">
+      <button class="topic-btn" id="tb-rnd" onclick="setTopicMode(false)"><i class="ico">↻</i></button>
+      <button class="topic-btn" id="tb-auto" onclick="setTopicMode(true)"><i class="ico">★</i></button>
+    </div>
+    <div class="topic-now" id="topic-now"></div>
+  </div>
+  <div class="set-sec">
+    <div class="set-lbl" id="set-nat-lbl">Знаю язык</div>
+    <div class="set-langs">
+      <div class="slt" id="sn-ru" onclick="setNat('ru')"><div>🇷🇺</div><div class="snm">RU</div></div>
+      <div class="slt" id="sn-uk" onclick="setNat('uk')"><div>🇺🇦</div><div class="snm">UK</div></div>
+      <div class="slt" id="sn-en" onclick="setNat('en')"><div>🇬🇧</div><div class="snm">EN</div></div>
+      <div class="slt" id="sn-fi" onclick="setNat('fi')"><div>🇫🇮</div><div class="snm">FI</div></div>
+    </div>
+  </div>
+  <div class="set-sec">
+    <div class="set-lbl" id="set-tgt-lbl">Изучаю</div>
+    <div class="set-langs">
+      <div class="slt" id="stl-fi" onclick="togTgt('fi')"><div>🇫🇮</div><div class="snm">FI</div></div>
+      <div class="slt" id="stl-en" onclick="togTgt('en')"><div>🇬🇧</div><div class="snm">EN</div></div>
+      <div class="slt" id="stl-uk" onclick="togTgt('uk')"><div>🇺🇦</div><div class="snm">UK</div></div>
+      <div class="slt" id="stl-ru" onclick="togTgt('ru')"><div>🇷🇺</div><div class="snm">RU</div></div>
+    </div>
+  </div>
+  <div class="set-sec" id="set-act-sec" style="display:none">
+    <div class="set-lbl">Активный язык</div>
+    <div class="set-act-tabs" id="set-act-tabs"></div>
+  </div>
+  <div class="set-divider"></div>
+  <div class="set-footer">Harmony Life ry · Harmony Words · 409 слов<br>
+    <span class="set-danger" onclick="confirmReset()">↺ Сбросить прогресс</span></div>
+</div>
+
+<!-- RESET DIALOG -->
+<div id="reset-dlg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center;padding:20px">
+  <div class="reset-card">
+    <h3>⚠️ Сбросить прогресс?</h3>
+    <p>Весь прогресс будет удалён. Отменить нельзя.</p>
+    <div class="reset-btns">
+      <button style="background:var(--bg2)" onclick="el('reset-dlg').style.display='none'">Отмена</button>
+      <button style="background:var(--no);color:#fff" onclick="doReset()">Сбросить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── WORD DATABASE ── */
+const W = [
+  // Местоимения
+  {id:1,  c:"Местоимения", ru:"я",                fi:"minä",              en:"I", uk:"я"},
+  {id:2,  c:"Местоимения", ru:"ты",               fi:"sinä",              en:"you", uk:"ти"},
+  {id:3,  c:"Местоимения", ru:"он",               fi:"hän",               en:"he", uk:"він"},
+  {id:4,  c:"Местоимения", ru:"она",              fi:"hän",               en:"she", uk:"вона"},
+  {id:5,  c:"Местоимения", ru:"оно",              fi:"se",                en:"it", uk:"воно"},
+  {id:6,  c:"Местоимения", ru:"мы",               fi:"me",                en:"we", uk:"ми"},
+  {id:7,  c:"Местоимения", ru:"вы",               fi:"te",                en:"you (pl.)", uk:"ви"},
+  {id:8,  c:"Местоимения", ru:"они",              fi:"he",                en:"they", uk:"вони"},
+  {id:9,  c:"Местоимения", ru:"кто",              fi:"kuka",              en:"who", uk:"хто"},
+  {id:10, c:"Местоимения", ru:"что",              fi:"mikä",              en:"what", uk:"що"},
+  {id:11, c:"Местоимения", ru:"какой",            fi:"millainen",         en:"which", uk:"який"},
+  {id:12, c:"Местоимения", ru:"чей",              fi:"kenen",             en:"whose", uk:"чий"},
+  {id:13, c:"Местоимения", ru:"где",              fi:"missä",             en:"where", uk:"де"},
+  {id:14, c:"Местоимения", ru:"когда",            fi:"milloin",           en:"when", uk:"коли"},
+  {id:15, c:"Местоимения", ru:"почему",           fi:"miksi",             en:"why", uk:"чому"},
+  {id:16, c:"Местоимения", ru:"как",              fi:"kuinka",            en:"how", uk:"як"},
+  {id:17, c:"Местоимения", ru:"сколько",          fi:"kuinka paljon",     en:"how much", uk:"скільки"},
+  {id:18, c:"Местоимения", ru:"этот",             fi:"tämä",              en:"this", uk:"цей"},
+  {id:19, c:"Местоимения", ru:"тот",              fi:"tuo",               en:"that", uk:"той"},
+  {id:20, c:"Местоимения", ru:"себя",             fi:"itse",              en:"oneself", uk:"себе"},
+  // Числа
+  {id:21, c:"Числа", ru:"один",          fi:"yksi",          en:"one", uk:"один"},
+  {id:22, c:"Числа", ru:"два",           fi:"kaksi",         en:"two", uk:"два"},
+  {id:23, c:"Числа", ru:"три",           fi:"kolme",         en:"three", uk:"три"},
+  {id:24, c:"Числа", ru:"четыре",        fi:"neljä",         en:"four", uk:"чотири"},
+  {id:25, c:"Числа", ru:"пять",          fi:"viisi",         en:"five", uk:"п'ять"},
+  {id:26, c:"Числа", ru:"шесть",         fi:"kuusi",         en:"six", uk:"шість"},
+  {id:27, c:"Числа", ru:"семь",          fi:"seitsemän",     en:"seven", uk:"сім"},
+  {id:28, c:"Числа", ru:"восемь",        fi:"kahdeksan",     en:"eight", uk:"вісім"},
+  {id:29, c:"Числа", ru:"девять",        fi:"yhdeksän",      en:"nine", uk:"дев'ять"},
+  {id:30, c:"Числа", ru:"десять",        fi:"kymmenen",      en:"ten", uk:"десять"},
+  {id:31, c:"Числа", ru:"сто",           fi:"sata",          en:"hundred", uk:"сто"},
+  {id:32, c:"Числа", ru:"тысяча",        fi:"tuhat",         en:"thousand", uk:"тисяча"},
+  {id:33, c:"Числа", ru:"первый",        fi:"ensimmäinen",   en:"first", uk:"перший"},
+  {id:34, c:"Числа", ru:"второй",        fi:"toinen",        en:"second", uk:"другий"},
+  {id:35, c:"Числа", ru:"много",         fi:"paljon",        en:"many/much", uk:"багато"},
+  {id:36, c:"Числа", ru:"мало",          fi:"vähän",         en:"few/little", uk:"мало"},
+  {id:37, c:"Числа", ru:"все",           fi:"kaikki",        en:"all", uk:"всі"},
+  {id:38, c:"Числа", ru:"несколько",     fi:"muutama",       en:"several", uk:"кілька"},
+  {id:39, c:"Числа", ru:"половина",      fi:"puoli",         en:"half", uk:"половина"},
+  {id:40, c:"Числа", ru:"ноль",          fi:"nolla",         en:"zero", uk:"нуль"},
+  // Люди и семья
+  {id:41, c:"Семья", ru:"человек",            fi:"ihminen",   en:"person", uk:"людина"},
+  {id:42, c:"Семья", ru:"мужчина",            fi:"mies",      en:"man", uk:"чоловік"},
+  {id:43, c:"Семья", ru:"женщина",            fi:"nainen",    en:"woman", uk:"жінка"},
+  {id:44, c:"Семья", ru:"ребёнок",            fi:"lapsi",     en:"child", uk:"дитина"},
+  {id:45, c:"Семья", ru:"друг",               fi:"ystävä",    en:"friend", uk:"друг"},
+  {id:46, c:"Семья", ru:"имя",                fi:"nimi",      en:"name", uk:"ім'я"},
+  {id:47, c:"Семья", ru:"мать",               fi:"äiti",      en:"mother", uk:"мати"},
+  {id:48, c:"Семья", ru:"отец",               fi:"isä",       en:"father", uk:"батько"},
+  {id:49, c:"Семья", ru:"сын",                fi:"poika",     en:"son", uk:"син"},
+  {id:50, c:"Семья", ru:"дочь",               fi:"tytär",     en:"daughter", uk:"дочка"},
+  {id:51, c:"Семья", ru:"брат",               fi:"veli",      en:"brother", uk:"брат"},
+  {id:52, c:"Семья", ru:"сестра",             fi:"sisar",     en:"sister", uk:"сестра"},
+  {id:53, c:"Семья", ru:"муж",                fi:"aviomies",  en:"husband", uk:"чоловік"},
+  {id:54, c:"Семья", ru:"жена",               fi:"vaimo",     en:"wife", uk:"дружина"},
+  {id:55, c:"Семья", ru:"бабушка",            fi:"isoäiti",   en:"grandmother", uk:"бабуся"},
+  {id:56, c:"Семья", ru:"дедушка",            fi:"isoisä",    en:"grandfather", uk:"дідусь"},
+  {id:57, c:"Семья", ru:"семья",              fi:"perhe",     en:"family", uk:"сім'я"},
+  {id:58, c:"Семья", ru:"сосед",              fi:"naapuri",   en:"neighbor", uk:"сусід"},
+  {id:59, c:"Семья", ru:"гость",              fi:"vieras",    en:"guest", uk:"гість"},
+  {id:60, c:"Семья", ru:"взрослый",           fi:"aikuinen",  en:"adult", uk:"дорослий"},
+  {id:61, c:"Семья", ru:"старик",             fi:"vanhus",    en:"old man", uk:"старий"},
+  {id:62, c:"Семья", ru:"молодой человек",    fi:"nuorimies", en:"young man", uk:"молодий чоловік"},
+  {id:63, c:"Семья", ru:"девушка",            fi:"tyttö",     en:"girl", uk:"дівчина"},
+  {id:64, c:"Семья", ru:"парень",             fi:"kaveri",    en:"guy", uk:"хлопець"},
+  // Тело
+  {id:65, c:"Тело", ru:"голова",   fi:"pää",        en:"head", uk:"голова"},
+  {id:66, c:"Тело", ru:"глаз",     fi:"silmä",      en:"eye", uk:"око"},
+  {id:67, c:"Тело", ru:"ухо",      fi:"korva",      en:"ear", uk:"вухо"},
+  {id:68, c:"Тело", ru:"нос",      fi:"nenä",       en:"nose", uk:"ніс"},
+  {id:69, c:"Тело", ru:"рот",      fi:"suu",        en:"mouth", uk:"рот"},
+  {id:70, c:"Тело", ru:"зуб",      fi:"hammas",     en:"tooth", uk:"зуб"},
+  {id:71, c:"Тело", ru:"язык",     fi:"kieli",      en:"tongue", uk:"язик"},
+  {id:72, c:"Тело", ru:"волосы",   fi:"hiukset",    en:"hair", uk:"волосся"},
+  {id:73, c:"Тело", ru:"шея",      fi:"kaula",      en:"neck", uk:"шия"},
+  {id:74, c:"Тело", ru:"рука",     fi:"käsi",       en:"hand/arm", uk:"рука"},
+  {id:75, c:"Тело", ru:"палец",    fi:"sormi",      en:"finger", uk:"палець"},
+  {id:76, c:"Тело", ru:"нога",     fi:"jalka",      en:"leg/foot", uk:"нога"},
+  {id:77, c:"Тело", ru:"сердце",   fi:"sydän",      en:"heart", uk:"серце"},
+  {id:78, c:"Тело", ru:"кровь",    fi:"veri",       en:"blood", uk:"кров"},
+  {id:79, c:"Тело", ru:"кость",    fi:"luu",        en:"bone", uk:"кістка"},
+  {id:80, c:"Тело", ru:"кожа",     fi:"iho",        en:"skin", uk:"шкіра"},
+  {id:81, c:"Тело", ru:"живот",    fi:"vatsa",      en:"belly", uk:"живіт"},
+  {id:82, c:"Тело", ru:"спина",    fi:"selkä",      en:"back", uk:"спина"},
+  {id:83, c:"Тело", ru:"плечо",    fi:"olkapää",    en:"shoulder", uk:"плече"},
+  {id:84, c:"Тело", ru:"колено",   fi:"polvi",      en:"knee", uk:"коліно"},
+  {id:85, c:"Тело", ru:"грудь",    fi:"rinta",      en:"chest", uk:"груди"},
+  {id:86, c:"Тело", ru:"лицо",     fi:"kasvot",     en:"face", uk:"обличчя"},
+  {id:87, c:"Тело", ru:"тело",     fi:"keho",       en:"body", uk:"тіло"},
+  {id:88, c:"Тело", ru:"локоть",   fi:"kyynärpää",  en:"elbow", uk:"лікоть"},
+  {id:89, c:"Тело", ru:"мозг",     fi:"aivot",      en:"brain", uk:"мозок"},
+  // Природа
+  {id:90,  c:"Природа", ru:"солнце",   fi:"aurinko",  en:"sun", uk:"сонце"},
+  {id:91,  c:"Природа", ru:"луна",     fi:"kuu",      en:"moon", uk:"місяць"},
+  {id:92,  c:"Природа", ru:"звезда",   fi:"tähti",    en:"star", uk:"зірка"},
+  {id:93,  c:"Природа", ru:"небо",     fi:"taivas",   en:"sky", uk:"небо"},
+  {id:94,  c:"Природа", ru:"земля",    fi:"maa",      en:"earth", uk:"земля"},
+  {id:95,  c:"Природа", ru:"вода",     fi:"vesi",     en:"water", uk:"вода"},
+  {id:96,  c:"Природа", ru:"огонь",    fi:"tuli",     en:"fire", uk:"вогонь"},
+  {id:97,  c:"Природа", ru:"воздух",   fi:"ilma",     en:"air", uk:"повітря"},
+  {id:98,  c:"Природа", ru:"ветер",    fi:"tuuli",    en:"wind", uk:"вітер"},
+  {id:99,  c:"Природа", ru:"дождь",    fi:"sade",     en:"rain", uk:"дощ"},
+  {id:100, c:"Природа", ru:"снег",     fi:"lumi",     en:"snow", uk:"сніг"},
+  {id:101, c:"Природа", ru:"лёд",      fi:"jää",      en:"ice", uk:"лід"},
+  {id:102, c:"Природа", ru:"гора",     fi:"vuori",    en:"mountain", uk:"гора"},
+  {id:103, c:"Природа", ru:"река",     fi:"joki",     en:"river", uk:"річка"},
+  {id:104, c:"Природа", ru:"море",     fi:"meri",     en:"sea", uk:"море"},
+  {id:105, c:"Природа", ru:"озеро",    fi:"järvi",    en:"lake", uk:"озеро"},
+  {id:106, c:"Природа", ru:"лес",      fi:"metsä",    en:"forest", uk:"ліс"},
+  {id:107, c:"Природа", ru:"дерево",   fi:"puu",      en:"tree", uk:"дерево"},
+  {id:108, c:"Природа", ru:"камень",   fi:"kivi",     en:"stone", uk:"камінь"},
+  {id:109, c:"Природа", ru:"песок",    fi:"hiekka",   en:"sand", uk:"пісок"},
+  {id:110, c:"Природа", ru:"трава",    fi:"ruoho",    en:"grass", uk:"трава"},
+  {id:111, c:"Природа", ru:"цветок",   fi:"kukka",    en:"flower", uk:"квітка"},
+  {id:112, c:"Природа", ru:"листок",   fi:"lehti",    en:"leaf", uk:"листок"},
+  {id:113, c:"Природа", ru:"корень",   fi:"juuri",    en:"root", uk:"корінь"},
+  {id:114, c:"Природа", ru:"облако",   fi:"pilvi",    en:"cloud", uk:"хмара"},
+  {id:115, c:"Природа", ru:"молния",   fi:"salama",   en:"lightning", uk:"блискавка"},
+  {id:116, c:"Природа", ru:"гром",     fi:"ukkonen",  en:"thunder", uk:"грім"},
+  {id:117, c:"Природа", ru:"долина",   fi:"laakso",   en:"valley", uk:"долина"},
+  {id:118, c:"Природа", ru:"остров",   fi:"saari",    en:"island", uk:"острів"},
+  {id:119, c:"Природа", ru:"пустыня",  fi:"aavikko",  en:"desert", uk:"пустеля"},
+  // Животные
+  {id:120, c:"Животные", ru:"собака",    fi:"koira",       en:"dog", uk:"собака"},
+  {id:121, c:"Животные", ru:"кошка",     fi:"kissa",       en:"cat", uk:"кішка"},
+  {id:122, c:"Животные", ru:"птица",     fi:"lintu",       en:"bird", uk:"птах"},
+  {id:123, c:"Животные", ru:"рыба",      fi:"kala",        en:"fish", uk:"риба"},
+  {id:124, c:"Животные", ru:"змея",      fi:"käärme",      en:"snake", uk:"змія"},
+  {id:125, c:"Животные", ru:"насекомое", fi:"hyönteinen",  en:"insect", uk:"комаха"},
+  {id:126, c:"Животные", ru:"мышь",      fi:"hiiri",       en:"mouse", uk:"миша"},
+  {id:127, c:"Животные", ru:"волк",      fi:"susi",        en:"wolf", uk:"вовк"},
+  {id:128, c:"Животные", ru:"медведь",   fi:"karhu",       en:"bear", uk:"ведмідь"},
+  {id:129, c:"Животные", ru:"лошадь",    fi:"hevonen",     en:"horse", uk:"кінь"},
+  {id:130, c:"Животные", ru:"корова",    fi:"lehmä",       en:"cow", uk:"корова"},
+  {id:131, c:"Животные", ru:"овца",      fi:"lammas",      en:"sheep", uk:"вівця"},
+  {id:132, c:"Животные", ru:"свинья",    fi:"sika",        en:"pig", uk:"свиня"},
+  {id:133, c:"Животные", ru:"коза",      fi:"vuohi",       en:"goat", uk:"коза"},
+  {id:134, c:"Животные", ru:"курица",    fi:"kana",        en:"hen", uk:"курка"},
+  {id:135, c:"Животные", ru:"лев",       fi:"leijona",     en:"lion", uk:"лев"},
+  {id:136, c:"Животные", ru:"слон",      fi:"norsu",       en:"elephant", uk:"слон"},
+  {id:137, c:"Животные", ru:"заяц",      fi:"jänis",       en:"hare", uk:"заєць"},
+  {id:138, c:"Животные", ru:"олень",     fi:"peura",       en:"deer", uk:"олень"},
+  {id:139, c:"Животные", ru:"лягушка",   fi:"sammakko",    en:"frog", uk:"жаба"},
+  {id:140, c:"Животные", ru:"муха",      fi:"kärpänen",    en:"fly", uk:"муха"},
+  {id:141, c:"Животные", ru:"пчела",     fi:"mehiläinen",  en:"bee", uk:"бджола"},
+  {id:142, c:"Животные", ru:"паук",      fi:"hämähäkki",   en:"spider", uk:"павук"},
+  {id:143, c:"Животные", ru:"черепаха",  fi:"kilpikonna",  en:"turtle", uk:"черепаха"},
+  {id:144, c:"Животные", ru:"хвост",     fi:"häntä",       en:"tail", uk:"хвіст"},
+  // Время
+  {id:145, c:"Время", ru:"время",     fi:"aika",       en:"time", uk:"час"},
+  {id:146, c:"Время", ru:"день",      fi:"päivä",      en:"day", uk:"день"},
+  {id:147, c:"Время", ru:"ночь",      fi:"yö",         en:"night", uk:"ніч"},
+  {id:148, c:"Время", ru:"утро",      fi:"aamu",       en:"morning", uk:"ранок"},
+  {id:149, c:"Время", ru:"вечер",     fi:"ilta",       en:"evening", uk:"вечір"},
+  {id:150, c:"Время", ru:"час",       fi:"tunti",      en:"hour", uk:"година"},
+  {id:151, c:"Время", ru:"минута",    fi:"minuutti",   en:"minute", uk:"хвилина"},
+  {id:152, c:"Время", ru:"секунда",   fi:"sekunti",    en:"second", uk:"секунда"},
+  {id:153, c:"Время", ru:"неделя",    fi:"viikko",     en:"week", uk:"тиждень"},
+  {id:154, c:"Время", ru:"месяц",     fi:"kuukausi",   en:"month", uk:"місяць"},
+  {id:155, c:"Время", ru:"год",       fi:"vuosi",      en:"year", uk:"рік"},
+  {id:156, c:"Время", ru:"сегодня",   fi:"tänään",     en:"today", uk:"сьогодні"},
+  {id:157, c:"Время", ru:"вчера",     fi:"eilen",      en:"yesterday", uk:"вчора"},
+  {id:158, c:"Время", ru:"завтра",    fi:"huomenna",   en:"tomorrow", uk:"завтра"},
+  {id:159, c:"Время", ru:"сейчас",    fi:"nyt",        en:"now", uk:"зараз"},
+  {id:160, c:"Время", ru:"потом",     fi:"sitten",     en:"later", uk:"потім"},
+  {id:161, c:"Время", ru:"рано",      fi:"aikaisin",   en:"early", uk:"рано"},
+  {id:162, c:"Время", ru:"поздно",    fi:"myöhään",    en:"late", uk:"пізно"},
+  {id:163, c:"Время", ru:"весна",     fi:"kevät",      en:"spring", uk:"весна"},
+  {id:164, c:"Время", ru:"лето",      fi:"kesä",       en:"summer", uk:"літо"},
+  {id:165, c:"Время", ru:"осень",     fi:"syksy",      en:"autumn", uk:"осінь"},
+  {id:166, c:"Время", ru:"зима",      fi:"talvi",      en:"winter", uk:"зима"},
+  {id:167, c:"Время", ru:"начало",    fi:"alku",       en:"beginning", uk:"початок"},
+  {id:168, c:"Время", ru:"конец",     fi:"loppu",      en:"end", uk:"кінець"},
+  {id:169, c:"Время", ru:"всегда",    fi:"aina",       en:"always", uk:"завжди"},
+  // Цвета
+  {id:170, c:"Цвета", ru:"белый",       fi:"valkoinen",  en:"white", uk:"білий"},
+  {id:171, c:"Цвета", ru:"чёрный",      fi:"musta",      en:"black", uk:"чорний"},
+  {id:172, c:"Цвета", ru:"красный",     fi:"punainen",   en:"red", uk:"червоний"},
+  {id:173, c:"Цвета", ru:"зелёный",     fi:"vihreä",     en:"green", uk:"зелений"},
+  {id:174, c:"Цвета", ru:"жёлтый",      fi:"keltainen",  en:"yellow", uk:"жовтий"},
+  {id:175, c:"Цвета", ru:"синий",       fi:"sininen",    en:"blue", uk:"синій"},
+  {id:176, c:"Цвета", ru:"коричневый",  fi:"ruskea",     en:"brown", uk:"коричневий"},
+  {id:177, c:"Цвета", ru:"серый",       fi:"harmaa",     en:"gray", uk:"сірий"},
+  // Качества
+  {id:178, c:"Качества", ru:"большой",     fi:"iso",       en:"big", uk:"великий"},
+  {id:179, c:"Качества", ru:"маленький",   fi:"pieni",     en:"small", uk:"маленький"},
+  {id:180, c:"Качества", ru:"длинный",     fi:"pitkä",     en:"long", uk:"довгий"},
+  {id:181, c:"Качества", ru:"короткий",    fi:"lyhyt",     en:"short", uk:"короткий"},
+  {id:182, c:"Качества", ru:"широкий",     fi:"leveä",     en:"wide", uk:"широкий"},
+  {id:183, c:"Качества", ru:"узкий",       fi:"kapea",     en:"narrow", uk:"вузький"},
+  {id:184, c:"Качества", ru:"толстый",     fi:"paksu",     en:"thick", uk:"товстий"},
+  {id:185, c:"Качества", ru:"тонкий",      fi:"ohut",      en:"thin", uk:"тонкий"},
+  {id:186, c:"Качества", ru:"тяжёлый",     fi:"raskas",    en:"heavy", uk:"важкий"},
+  {id:187, c:"Качества", ru:"лёгкий",      fi:"kevyt",     en:"light", uk:"легкий"},
+  {id:188, c:"Качества", ru:"полный",      fi:"täysi",     en:"full", uk:"повний"},
+  {id:189, c:"Качества", ru:"пустой",      fi:"tyhjä",     en:"empty", uk:"порожній"},
+  {id:190, c:"Качества", ru:"новый",       fi:"uusi",      en:"new", uk:"новий"},
+  {id:191, c:"Качества", ru:"старый",      fi:"vanha",     en:"old", uk:"старий"},
+  {id:192, c:"Качества", ru:"хороший",     fi:"hyvä",      en:"good", uk:"хороший"},
+  {id:193, c:"Качества", ru:"плохой",      fi:"huono",     en:"bad", uk:"поганий"},
+  {id:194, c:"Качества", ru:"красивый",    fi:"kaunis",    en:"beautiful", uk:"гарний"},
+  {id:195, c:"Качества", ru:"чистый",      fi:"puhdas",    en:"clean", uk:"чистий"},
+  {id:196, c:"Качества", ru:"грязный",     fi:"likainen",  en:"dirty", uk:"брудний"},
+  {id:197, c:"Качества", ru:"правильный",  fi:"oikea",     en:"correct", uk:"правильний"},
+  {id:198, c:"Качества", ru:"неправильный",fi:"väärä",     en:"incorrect", uk:"неправильний"},
+  {id:199, c:"Качества", ru:"тёплый",      fi:"lämmin",    en:"warm", uk:"теплий"},
+  {id:200, c:"Качества", ru:"холодный",    fi:"kylmä",     en:"cold", uk:"холодний"},
+  {id:201, c:"Качества", ru:"горячий",     fi:"kuuma",     en:"hot", uk:"гарячий"},
+  {id:202, c:"Качества", ru:"мокрый",      fi:"märkä",     en:"wet", uk:"мокрий"},
+  {id:203, c:"Качества", ru:"сухой",       fi:"kuiva",     en:"dry", uk:"сухий"},
+  {id:204, c:"Качества", ru:"твёрдый",     fi:"kova",      en:"hard", uk:"твердий"},
+  {id:205, c:"Качества", ru:"мягкий",      fi:"pehmeä",    en:"soft", uk:"м'який"},
+  {id:206, c:"Качества", ru:"гладкий",     fi:"sileä",     en:"smooth", uk:"гладкий"},
+  {id:207, c:"Качества", ru:"острый",      fi:"terävä",    en:"sharp", uk:"гострий"},
+  {id:208, c:"Качества", ru:"тупой",       fi:"tylsä",     en:"blunt", uk:"тупий"},
+  {id:209, c:"Качества", ru:"прямой",      fi:"suora",     en:"straight", uk:"прямий"},
+  {id:210, c:"Качества", ru:"круглый",     fi:"pyöreä",    en:"round", uk:"круглий"},
+  {id:211, c:"Качества", ru:"ровный",      fi:"tasainen",  en:"even/flat", uk:"рівний"},
+  {id:212, c:"Качества", ru:"глубокий",    fi:"syvä",      en:"deep", uk:"глибокий"},
+  {id:213, c:"Качества", ru:"мелкий",      fi:"matala",    en:"shallow", uk:"мілкий"},
+  {id:214, c:"Качества", ru:"далеко",      fi:"kaukana",   en:"far", uk:"далеко"},
+  {id:215, c:"Качества", ru:"близко",      fi:"lähellä",   en:"close", uk:"близько"},
+  {id:216, c:"Качества", ru:"правый",      fi:"oikea",     en:"right", uk:"правий"},
+  {id:217, c:"Качества", ru:"левый",       fi:"vasen",     en:"left", uk:"лівий"},
+  {id:218, c:"Качества", ru:"верх",        fi:"ylä",       en:"top", uk:"верх"},
+  {id:219, c:"Качества", ru:"низ",         fi:"ala",       en:"bottom", uk:"низ"},
+  // Глаголы
+  {id:220, c:"Глаголы", ru:"быть",              fi:"olla",              en:"to be", uk:"бути"},
+  {id:221, c:"Глаголы", ru:"иметь",             fi:"omistaa",           en:"to have", uk:"мати"},
+  {id:222, c:"Глаголы", ru:"делать",            fi:"tehdä",             en:"to do", uk:"робити"},
+  {id:223, c:"Глаголы", ru:"идти",              fi:"mennä",             en:"to go", uk:"іти"},
+  {id:224, c:"Глаголы", ru:"приходить",         fi:"tulla",             en:"to come", uk:"приходити"},
+  {id:225, c:"Глаголы", ru:"видеть",            fi:"nähdä",             en:"to see", uk:"бачити"},
+  {id:226, c:"Глаголы", ru:"слышать",           fi:"kuulla",            en:"to hear", uk:"чути"},
+  {id:227, c:"Глаголы", ru:"знать",             fi:"tietää",            en:"to know", uk:"знати"},
+  {id:228, c:"Глаголы", ru:"думать",            fi:"ajatella",          en:"to think", uk:"думати"},
+  {id:229, c:"Глаголы", ru:"хотеть",            fi:"haluta",            en:"to want", uk:"хотіти"},
+  {id:230, c:"Глаголы", ru:"говорить",          fi:"puhua",             en:"to speak", uk:"говорити"},
+  {id:231, c:"Глаголы", ru:"сказать",           fi:"sanoa",             en:"to say", uk:"сказати"},
+  {id:232, c:"Глаголы", ru:"есть",              fi:"syödä",             en:"to eat", uk:"їсти"},
+  {id:233, c:"Глаголы", ru:"пить",              fi:"juoda",             en:"to drink", uk:"пити"},
+  {id:234, c:"Глаголы", ru:"спать",             fi:"nukkua",            en:"to sleep", uk:"спати"},
+  {id:235, c:"Глаголы", ru:"жить",              fi:"elää",              en:"to live", uk:"жити"},
+  {id:236, c:"Глаголы", ru:"умирать",           fi:"kuolla",            en:"to die", uk:"вмирати"},
+  {id:237, c:"Глаголы", ru:"давать",            fi:"antaa",             en:"to give", uk:"давати"},
+  {id:238, c:"Глаголы", ru:"брать",             fi:"ottaa",             en:"to take", uk:"брати"},
+  {id:239, c:"Глаголы", ru:"держать",           fi:"pitää",             en:"to hold", uk:"тримати"},
+  {id:240, c:"Глаголы", ru:"бросать",           fi:"heittää",           en:"to throw", uk:"кидати"},
+  {id:241, c:"Глаголы", ru:"тянуть",            fi:"vetää",             en:"to pull", uk:"тягнути"},
+  {id:242, c:"Глаголы", ru:"толкать",           fi:"työntää",           en:"to push", uk:"штовхати"},
+  {id:243, c:"Глаголы", ru:"резать",            fi:"leikata",           en:"to cut", uk:"різати"},
+  {id:244, c:"Глаголы", ru:"ломать",            fi:"rikkoa",            en:"to break", uk:"ламати"},
+  {id:245, c:"Глаголы", ru:"работать",          fi:"työskennellä",      en:"to work", uk:"працювати"},
+  {id:246, c:"Глаголы", ru:"играть",            fi:"pelata",            en:"to play", uk:"грати"},
+  {id:247, c:"Глаголы", ru:"петь",              fi:"laulaa",            en:"to sing", uk:"співати"},
+  {id:248, c:"Глаголы", ru:"танцевать",         fi:"tanssia",           en:"to dance", uk:"танцювати"},
+  {id:249, c:"Глаголы", ru:"смеяться",          fi:"nauraa",            en:"to laugh", uk:"сміятися"},
+  {id:250, c:"Глаголы", ru:"плакать",           fi:"itkeä",             en:"to cry", uk:"плакати"},
+  {id:251, c:"Глаголы", ru:"бояться",           fi:"pelätä",            en:"to be afraid", uk:"боятися"},
+  {id:252, c:"Глаголы", ru:"любить",            fi:"rakastaa",          en:"to love", uk:"кохати"},
+  {id:253, c:"Глаголы", ru:"ненавидеть",        fi:"vihata",            en:"to hate", uk:"ненавидіти"},
+  {id:254, c:"Глаголы", ru:"помогать",          fi:"auttaa",            en:"to help", uk:"допомагати"},
+  {id:255, c:"Глаголы", ru:"искать",            fi:"etsiä",             en:"to search", uk:"шукати"},
+  {id:256, c:"Глаголы", ru:"находить",          fi:"löytää",            en:"to find", uk:"знаходити"},
+  {id:257, c:"Глаголы", ru:"терять",            fi:"menettää",          en:"to lose", uk:"губити"},
+  {id:258, c:"Глаголы", ru:"покупать",          fi:"ostaa",             en:"to buy", uk:"купувати"},
+  {id:259, c:"Глаголы", ru:"продавать",         fi:"myydä",             en:"to sell", uk:"продавати"},
+  {id:260, c:"Глаголы", ru:"платить",           fi:"maksaa",            en:"to pay", uk:"платити"},
+  {id:261, c:"Глаголы", ru:"готовить",          fi:"valmistaa ruokaa",  en:"to cook", uk:"готувати"},
+  {id:262, c:"Глаголы", ru:"мыть",              fi:"pestä",             en:"to wash", uk:"мити"},
+  {id:263, c:"Глаголы", ru:"писать",            fi:"kirjoittaa",        en:"to write", uk:"писати"},
+  {id:264, c:"Глаголы", ru:"читать",            fi:"lukea",             en:"to read", uk:"читати"},
+  {id:265, c:"Глаголы", ru:"учиться",           fi:"opiskella",         en:"to study", uk:"вчитися"},
+  {id:266, c:"Глаголы", ru:"учить",             fi:"opettaa",           en:"to teach", uk:"навчати"},
+  {id:267, c:"Глаголы", ru:"понимать",          fi:"ymmärtää",          en:"to understand", uk:"розуміти"},
+  {id:268, c:"Глаголы", ru:"забывать",          fi:"unohtaa",           en:"to forget", uk:"забувати"},
+  {id:269, c:"Глаголы", ru:"помнить",           fi:"muistaa",           en:"to remember", uk:"пам'ятати"},
+  {id:270, c:"Глаголы", ru:"ждать",             fi:"odottaa",           en:"to wait", uk:"чекати"},
+  {id:271, c:"Глаголы", ru:"начинать",          fi:"aloittaa",          en:"to begin", uk:"починати"},
+  {id:272, c:"Глаголы", ru:"заканчивать",       fi:"lopettaa",          en:"to finish", uk:"закінчувати"},
+  {id:273, c:"Глаголы", ru:"останавливаться",   fi:"pysähtyä",          en:"to stop", uk:"зупинятися"},
+  {id:274, c:"Глаголы", ru:"продолжать",        fi:"jatkaa",            en:"to continue", uk:"продовжувати"},
+  // Движение
+  {id:275, c:"Движение", ru:"бежать",          fi:"juosta",          en:"to run", uk:"бігти"},
+  {id:276, c:"Движение", ru:"лететь",          fi:"lentää",          en:"to fly", uk:"летіти"},
+  {id:277, c:"Движение", ru:"плыть",           fi:"uida",            en:"to swim", uk:"плисти"},
+  {id:278, c:"Движение", ru:"падать",          fi:"pudota",          en:"to fall", uk:"падати"},
+  {id:279, c:"Движение", ru:"сидеть",          fi:"istua",           en:"to sit", uk:"сидіти"},
+  {id:280, c:"Движение", ru:"стоять",          fi:"seisoa",          en:"to stand", uk:"стояти"},
+  {id:281, c:"Движение", ru:"лежать",          fi:"maata",           en:"to lie", uk:"лежати"},
+  {id:282, c:"Движение", ru:"вставать",        fi:"nousta",          en:"to get up", uk:"вставати"},
+  {id:283, c:"Движение", ru:"ложиться",        fi:"mennä makuulle",  en:"to lie down", uk:"лягати"},
+  {id:284, c:"Движение", ru:"входить",         fi:"tulla sisään",    en:"to enter", uk:"входити"},
+  {id:285, c:"Движение", ru:"выходить",        fi:"mennä ulos",      en:"to exit", uk:"виходити"},
+  {id:286, c:"Движение", ru:"подниматься",     fi:"nousta ylös",     en:"to go up", uk:"підніматися"},
+  {id:287, c:"Движение", ru:"спускаться",      fi:"laskeutua",       en:"to go down", uk:"спускатися"},
+  {id:288, c:"Движение", ru:"поворачивать",    fi:"kääntyä",         en:"to turn", uk:"повертати"},
+  {id:289, c:"Движение", ru:"следовать",       fi:"seurata",         en:"to follow", uk:"слідувати"},
+  {id:290, c:"Движение", ru:"вести",           fi:"johtaa",          en:"to lead", uk:"вести"},
+  {id:291, c:"Движение", ru:"нести",           fi:"kantaa",          en:"to carry", uk:"нести"},
+  {id:292, c:"Движение", ru:"посылать",        fi:"lähettää",        en:"to send", uk:"посилати"},
+  {id:293, c:"Движение", ru:"встречать",       fi:"tavata",          en:"to meet", uk:"зустрічати"},
+  {id:294, c:"Движение", ru:"оставлять",       fi:"jättää",          en:"to leave", uk:"залишати"},
+  // Дом и предметы
+  {id:295, c:"Дом", ru:"дом",       fi:"talo",      en:"house", uk:"будинок"},
+  {id:296, c:"Дом", ru:"дверь",     fi:"ovi",       en:"door", uk:"двері"},
+  {id:297, c:"Дом", ru:"окно",      fi:"ikkuna",    en:"window", uk:"вікно"},
+  {id:298, c:"Дом", ru:"стол",      fi:"pöytä",     en:"table", uk:"стіл"},
+  {id:299, c:"Дом", ru:"стул",      fi:"tuoli",     en:"chair", uk:"стілець"},
+  {id:300, c:"Дом", ru:"кровать",   fi:"sänky",     en:"bed", uk:"ліжко"},
+  {id:301, c:"Дом", ru:"комната",   fi:"huone",     en:"room", uk:"кімната"},
+  {id:302, c:"Дом", ru:"стена",     fi:"seinä",     en:"wall", uk:"стіна"},
+  {id:303, c:"Дом", ru:"крыша",     fi:"katto",     en:"roof", uk:"дах"},
+  {id:304, c:"Дом", ru:"пол",       fi:"lattia",    en:"floor", uk:"підлога"},
+  {id:305, c:"Дом", ru:"нож",       fi:"veitsi",    en:"knife", uk:"ніж"},
+  {id:306, c:"Дом", ru:"верёвка",   fi:"köysi",     en:"rope", uk:"мотузка"},
+  {id:307, c:"Дом", ru:"одежда",    fi:"vaatteet",  en:"clothes", uk:"одяг"},
+  {id:308, c:"Дом", ru:"обувь",     fi:"kengät",    en:"shoes", uk:"взуття"},
+  {id:309, c:"Дом", ru:"шапка",     fi:"pipo",      en:"hat", uk:"шапка"},
+  {id:310, c:"Дом", ru:"мешок",     fi:"säkki",     en:"sack", uk:"мішок"},
+  {id:311, c:"Дом", ru:"корзина",   fi:"kori",      en:"basket", uk:"кошик"},
+  {id:312, c:"Дом", ru:"посуда",    fi:"astiat",    en:"dishes", uk:"посуд"},
+  {id:313, c:"Дом", ru:"ложка",     fi:"lusikka",   en:"spoon", uk:"ложка"},
+  {id:314, c:"Дом", ru:"зеркало",   fi:"peili",     en:"mirror", uk:"дзеркало"},
+  {id:315, c:"Дом", ru:"ключ",      fi:"avain",     en:"key", uk:"ключ"},
+  {id:316, c:"Дом", ru:"замок",     fi:"lukko",     en:"lock", uk:"замок"},
+  {id:317, c:"Дом", ru:"лампа",     fi:"lamppu",    en:"lamp", uk:"лампа"},
+  {id:318, c:"Дом", ru:"книга",     fi:"kirja",     en:"book", uk:"книга"},
+  // Еда
+  {id:319, c:"Еда", ru:"хлеб",     fi:"leipä",     en:"bread", uk:"хліб"},
+  {id:320, c:"Еда", ru:"мясо",     fi:"liha",      en:"meat", uk:"м'ясо"},
+  {id:321, c:"Еда", ru:"молоко",   fi:"maito",     en:"milk", uk:"молоко"},
+  {id:322, c:"Еда", ru:"яйцо",     fi:"muna",      en:"egg", uk:"яйце"},
+  {id:323, c:"Еда", ru:"соль",     fi:"suola",     en:"salt", uk:"сіль"},
+  {id:324, c:"Еда", ru:"сахар",    fi:"sokeri",    en:"sugar", uk:"цукор"},
+  {id:325, c:"Еда", ru:"масло",    fi:"voi",       en:"butter", uk:"масло"},
+  {id:326, c:"Еда", ru:"сыр",      fi:"juusto",    en:"cheese", uk:"сир"},
+  {id:327, c:"Еда", ru:"фрукт",    fi:"hedelmä",   en:"fruit", uk:"фрукт"},
+  {id:328, c:"Еда", ru:"овощ",     fi:"vihannes",  en:"vegetable", uk:"овоч"},
+  {id:329, c:"Еда", ru:"суп",      fi:"keitto",    en:"soup", uk:"суп"},
+  {id:330, c:"Еда", ru:"каша",     fi:"puuro",     en:"porridge", uk:"каша"},
+  {id:331, c:"Еда", ru:"чай",      fi:"tee",       en:"tea", uk:"чай"},
+  {id:332, c:"Еда", ru:"кофе",     fi:"kahvi",     en:"coffee", uk:"кава"},
+  {id:333, c:"Еда", ru:"вино",     fi:"viini",     en:"wine", uk:"вино"},
+  {id:334, c:"Еда", ru:"голод",    fi:"nälkä",     en:"hunger", uk:"голод"},
+  {id:335, c:"Еда", ru:"жажда",    fi:"jano",      en:"thirst", uk:"спрага"},
+  {id:336, c:"Еда", ru:"вкус",     fi:"maku",      en:"taste", uk:"смак"},
+  {id:337, c:"Еда", ru:"сладкий",  fi:"makea",     en:"sweet", uk:"солодкий"},
+  // Общество
+  {id:338, c:"Общество", ru:"слово",      fi:"sana",        en:"word", uk:"слово"},
+  {id:339, c:"Общество", ru:"язык",       fi:"kieli",       en:"language", uk:"мова"},
+  {id:340, c:"Общество", ru:"голос",      fi:"ääni",        en:"voice", uk:"голос"},
+  {id:341, c:"Общество", ru:"вопрос",     fi:"kysymys",     en:"question", uk:"питання"},
+  {id:342, c:"Общество", ru:"ответ",      fi:"vastaus",     en:"answer", uk:"відповідь"},
+  {id:343, c:"Общество", ru:"новость",    fi:"uutinen",     en:"news", uk:"новина"},
+  {id:344, c:"Общество", ru:"история",    fi:"historia",    en:"story/history", uk:"історія"},
+  {id:345, c:"Общество", ru:"песня",      fi:"laulu",       en:"song", uk:"пісня"},
+  {id:346, c:"Общество", ru:"музыка",     fi:"musiikki",    en:"music", uk:"музика"},
+  {id:347, c:"Общество", ru:"игра",       fi:"peli",        en:"game", uk:"гра"},
+  {id:348, c:"Общество", ru:"закон",      fi:"laki",        en:"law", uk:"закон"},
+  {id:349, c:"Общество", ru:"деньги",     fi:"raha",        en:"money", uk:"гроші"},
+  {id:350, c:"Общество", ru:"работа",     fi:"työ",         en:"work", uk:"робота"},
+  {id:351, c:"Общество", ru:"город",      fi:"kaupunki",    en:"city", uk:"місто"},
+  {id:352, c:"Общество", ru:"деревня",    fi:"kylä",        en:"village", uk:"село"},
+  {id:353, c:"Общество", ru:"дорога",     fi:"tie",         en:"road", uk:"дорога"},
+  {id:354, c:"Общество", ru:"страна",     fi:"maa",         en:"country", uk:"країна"},
+  {id:355, c:"Общество", ru:"война",      fi:"sota",        en:"war", uk:"війна"},
+  {id:356, c:"Общество", ru:"мир",        fi:"rauha",       en:"peace", uk:"мир"},
+  {id:357, c:"Общество", ru:"правда",     fi:"totuus",      en:"truth", uk:"правда"},
+  {id:358, c:"Общество", ru:"ложь",       fi:"valhe",       en:"lie", uk:"брехня"},
+  {id:359, c:"Общество", ru:"тайна",      fi:"salaisuus",   en:"secret", uk:"таємниця"},
+  {id:360, c:"Общество", ru:"разговор",   fi:"keskustelu",  en:"conversation", uk:"розмова"},
+  // Связки
+  {id:361, c:"Связки", ru:"да",          fi:"kyllä",    en:"yes", uk:"так"},
+  {id:362, c:"Связки", ru:"нет",         fi:"ei",       en:"no", uk:"ні"},
+  {id:363, c:"Связки", ru:"и",           fi:"ja",       en:"and", uk:"і"},
+  {id:364, c:"Связки", ru:"или",         fi:"tai",      en:"or", uk:"або"},
+  {id:365, c:"Связки", ru:"но",          fi:"mutta",    en:"but", uk:"але"},
+  {id:366, c:"Связки", ru:"если",        fi:"jos",      en:"if", uk:"якщо"},
+  {id:367, c:"Связки", ru:"потому что",  fi:"koska",    en:"because", uk:"тому що"},
+  {id:368, c:"Связки", ru:"поэтому",     fi:"siksi",    en:"therefore", uk:"тому"},
+  {id:369, c:"Связки", ru:"с",           fi:"kanssa",   en:"with", uk:"з"},
+  {id:370, c:"Связки", ru:"без",         fi:"ilman",    en:"without", uk:"без"},
+  {id:371, c:"Связки", ru:"для",         fi:"varten",   en:"for", uk:"для"},
+  {id:372, c:"Связки", ru:"под",         fi:"alla",     en:"under", uk:"під"},
+  {id:373, c:"Связки", ru:"над",         fi:"yllä",     en:"above", uk:"над"},
+  {id:374, c:"Связки", ru:"между",       fi:"välissä",  en:"between", uk:"між"},
+  {id:375, c:"Связки", ru:"через",       fi:"läpi",     en:"through", uk:"через"},
+  {id:376, c:"Связки", ru:"после",       fi:"jälkeen",  en:"after", uk:"після"},
+  {id:377, c:"Связки", ru:"до",          fi:"ennen",    en:"before", uk:"до"},
+  {id:378, c:"Связки", ru:"вместо",      fi:"sijasta",  en:"instead of", uk:"замість"},
+  {id:379, c:"Связки", ru:"снова",       fi:"jälleen",  en:"again", uk:"знову"},
+  {id:380, c:"Связки", ru:"ещё",         fi:"vielä",    en:"still/yet", uk:"ще"},
+  {id:381, c:"Связки", ru:"уже",         fi:"jo",       en:"already", uk:"вже"},
+  {id:382, c:"Связки", ru:"только",      fi:"vain",     en:"only", uk:"тільки"},
+  {id:383, c:"Связки", ru:"тоже",        fi:"myös",     en:"also", uk:"також"},
+  {id:384, c:"Связки", ru:"очень",       fi:"erittäin", en:"very", uk:"дуже"},
+  {id:385, c:"Связки", ru:"почти",       fi:"melkein",  en:"almost", uk:"майже"},
+  // Чувства
+  {id:386, c:"Чувства", ru:"радость",    fi:"ilo",        en:"joy", uk:"радість"},
+  {id:387, c:"Чувства", ru:"грусть",     fi:"suru",       en:"sadness", uk:"смуток"},
+  {id:388, c:"Чувства", ru:"гнев",       fi:"viha",       en:"anger", uk:"гнів"},
+  {id:389, c:"Чувства", ru:"страх",      fi:"pelko",      en:"fear", uk:"страх"},
+  {id:390, c:"Чувства", ru:"удивление",  fi:"yllätys",    en:"surprise", uk:"здивування"},
+  {id:391, c:"Чувства", ru:"стыд",       fi:"häpeä",      en:"shame", uk:"сором"},
+  {id:392, c:"Чувства", ru:"гордость",   fi:"ylpeys",     en:"pride", uk:"гордість"},
+  {id:393, c:"Чувства", ru:"надежда",    fi:"toivo",      en:"hope", uk:"надія"},
+  {id:394, c:"Чувства", ru:"счастье",    fi:"onni",       en:"happiness", uk:"щастя"},
+  {id:395, c:"Чувства", ru:"боль",       fi:"kipu",       en:"pain", uk:"біль"},
+  {id:396, c:"Чувства", ru:"усталость",  fi:"väsymys",    en:"tiredness", uk:"втома"},
+  {id:397, c:"Чувства", ru:"сила",       fi:"voima",      en:"strength", uk:"сила"},
+  {id:398, c:"Чувства", ru:"слабость",   fi:"heikkous",   en:"weakness", uk:"слабкість"},
+  {id:399, c:"Чувства", ru:"здоровье",   fi:"terveys",    en:"health", uk:"здоров'я"},
+  {id:400, c:"Чувства", ru:"болезнь",    fi:"sairaus",    en:"illness", uk:"хвороба"},
+  {id:401, c:"Чувства", ru:"жизнь",      fi:"elämä",      en:"life", uk:"життя"},
+  {id:402, c:"Чувства", ru:"смерть",     fi:"kuolema",    en:"death", uk:"смерть"},
+  {id:403, c:"Чувства", ru:"душа",       fi:"sielu",      en:"soul", uk:"душа"},
+  {id:404, c:"Чувства", ru:"разум",      fi:"mieli",      en:"mind", uk:"розум"},
+  {id:405, c:"Чувства", ru:"свобода",    fi:"vapaus",     en:"freedom", uk:"свобода"},
+  {id:406, c:"Чувства", ru:"мечта",      fi:"unelma",     en:"dream", uk:"мрія"},
+  {id:407, c:"Чувства", ru:"покой",      fi:"rauha",      en:"calm", uk:"спокій"},
+  {id:408, c:"Чувства", ru:"тревога",    fi:"ahdistus",   en:"anxiety", uk:"тривога"},
+  {id:409, c:"Чувства", ru:"доверие",    fi:"luottamus",  en:"trust", uk:"довіра"},
+];
+/* ── CONFIG ── */
+const CAT_ORDER=['Местоимения','Числа','Семья','Тело','Природа','Животные',
+  'Время','Цвета','Качества','Глаголы','Движение','Дом','Еда','Общество','Связки','Чувства'];
+const CAT_ICONS={'Местоимения':'👤','Числа':'🔢','Семья':'👨‍👩‍👧','Тело':'🫀',
+  'Природа':'🌿','Животные':'🐾','Время':'⏰','Цвета':'🎨','Качества':'✨',
+  'Глаголы':'⚡','Движение':'🏃','Дом':'🏠','Еда':'🍎','Общество':'🌍','Связки':'🔗','Чувства':'❤️'};
+const LM={fi:{f:'🇫🇮',n:'Suomi'},en:{f:'🇬🇧',n:'English'},uk:{f:'🇺🇦',n:'Українська'},ru:{f:'🇷🇺',n:'Русский'}};
+const ALPHA={fi:'aeiouäöbdghjklmnprstvy'.split(''),en:'aeioubcdfghjklmnprstwy'.split(''),
+  ru:'аеиоуябвгджзйклмнпрстфхцчшщ'.split(''),uk:'аеиоуіябвгджзйклмнпрстфхцчшщ'.split('')};
+const DR={ru:['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
+  uk:['неділя','понеділок','вівторок','середа','четвер','пятниця','субота'],
+  en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']};
+const MR={ru:['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],
+  uk:['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'],
+  en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']};
+const UI={ru:{start:'Начать учёбу',greet:'Привет',new_w:'Новые',lrn_w:'Учу',kn_w:'✓ Знаю',
+    vocab:'Словарь',learned:'выучено',understood:'Понятно, дальше →',q_to:'Как по-{l}?',q_from:'Что это значит?',
+    grades:['💪 Не сдавайся!','😊 Продолжай!','👍 Хорошо!','🎉 Отлично!','🏆 Идеально!'],
+    err_btn:'Повторить ошибки',vocab:'Словарь',nat_lbl:'Знаю язык',tgt_lbl:'Изучаю',
+    topic_auto:'За темою',topic_rnd:'↻ Вперемішку',topic_now:'Сейчас: ',
+    done_today:'Всё на сегодня!',tmrw:'Завтра',nothing:'Нет слов',
+    remember:'Запомни: ',of:' из '},
+  uk:{start:'Почати навчання',greet:'Привіт',new_w:'Нові',lrn_w:'Вчу',kn_w:'✓ Знаю',
+    vocab:'Словник',learned:'вивчено',understood:'Зрозуміло, далі →',q_to:'Як по-{l}?',q_from:'Що це означає?',
+    grades:['💪 Не здавайся!','😊 Продовжуй!','👍 Добре!','🎉 Чудово!','🏆 Ідеально!'],
+    err_btn:'Повторити помилки',vocab:'Словник',nat_lbl:'Знаю мову',tgt_lbl:'Вивчаю',
+    topic_auto:'За темою',topic_rnd:'↻ Вперемішку',topic_now:'Зараз: ',
+    done_today:'Все на сьогодні!',tmrw:'Завтра',nothing:'Немає слів',
+    remember:'Запам\u2019ятай: ',of:' з '},
+  en:{start:'Start learning',greet:'Hello',new_w:'New',lrn_w:'Learning',kn_w:'✓ Known',
+    vocab:'Vocabulary',learned:'learned',understood:'Got it, next →',q_to:'In {l}?',q_from:'What does this mean?',
+    grades:["💪 Don't give up!",'😊 Keep going!','👍 Good!','🎉 Great!','🏆 Perfect!'],
+    err_btn:'Repeat errors',vocab:'Vocabulary',nat_lbl:'I know',tgt_lbl:'Learning',
+    topic_auto:'By topic',topic_rnd:'↻ Random',topic_now:'Now: ',
+    done_today:'Done for today!',tmrw:'Tomorrow',nothing:'No words',
+    remember:'Remember: ',of:' of '},
+};
+function u(){return UI[D.nat]||UI.ru;}
+function s(k){const r=u()[k];return r!==undefined?r:k;}
+function lname(l){return(LM[l]||{}).n||l;}
+function lflag(l){return(LM[l]||{}).f||'';}
+
+/* ── TELEGRAM ── */
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();if(tg.colorScheme==='dark')document.documentElement.setAttribute('data-theme','dark');}
+const TGS=tg?.CloudStorage;
+const SK='hw5';
+const B0=new Date('2024-01-01').getTime();
+const dn=d=>Math.floor((new Date(d).getTime()-B0)/864e5);
+const fd=n=>{const d=new Date(B0+n*864e5);return d.toISOString().slice(0,10);};
+const enc=e=>[e.box||0,e.reps||0,(e.next&&e.next>'2024-01-01')?dn(e.next):-1,e.lr?dn(e.lr):0,e.ok||0,e.bad||0,Math.round((e.ef||2.5)*100)];
+const dec=a=>({box:a[0],reps:a[1],next:(a[2]>0)?fd(a[2]):null,lr:a[3]?fd(a[3]):null,ok:a[4]||0,bad:a[5]||0,ef:(a[6]||250)/100,interval:a[1]<=1?1:a[1]<=2?3:a[1]<=3?7:30});
+function tryP(x){try{return JSON.parse(x)}catch{return null;}}
+
+function save(){
+  try{localStorage.setItem(SK+'_bk',JSON.stringify(D));}catch(e){}
+  if(!TGS)return;
+  TGS.setItem(SK+'_s',JSON.stringify({n:D.nat,a:D.act,x:D.settings||{}}),()=>{});
+  Object.entries(D.langs).forEach(([lang,ld])=>{
+    TGS.setItem(SK+'_'+lang+'_g',JSON.stringify({g:ld.goal,st:ld.st}),()=>{});
+    const chunks={};
+    Object.entries(ld.p).forEach(([id,e])=>{const ci=Math.floor((+id-1)/100);if(!chunks[ci])chunks[ci]={};chunks[ci][id]=enc(e);});
+    for(let i=0;i<5;i++){if(chunks[i])TGS.setItem(SK+'_'+lang+'_p'+i,JSON.stringify(chunks[i]),()=>{});}
+  });
+}
+function load(cb){
+  if(TGS){TGS.getKeys((err,keys)=>{
+    const ours=(keys||[]).filter(k=>k.startsWith(SK+'_'));
+    if(!ours.length){_loadLS(cb);return;}
+    TGS.getItems(ours,(err,items)=>{const d=_reassemble(items);if(d)cb(d);else _loadLS(cb);});
+  });}else _loadLS(cb);
+}
+function _loadLS(cb){cb(tryP(localStorage.getItem(SK+'_bk')||localStorage.getItem('hw_v5')));}
+function _reassemble(items){
+  if(!items||!items[SK+'_s'])return null;
+  const s=tryP(items[SK+'_s']);if(!s)return null;
+  const r={nat:s.n||'ru',act:s.a||'fi',settings:s.x||{},langs:{}};
+  ['fi','en','uk','ru'].forEach(lang=>{
+    const meta=tryP(items[SK+'_'+lang+'_g']);if(!meta)return;
+    const p={};for(let i=0;i<5;i++){const ch=tryP(items[SK+'_'+lang+'_p'+i]);if(ch)Object.entries(ch).forEach(([id,a])=>{p[id]=dec(a);});}
+    r.langs[lang]={goal:meta.g||10,p,st:meta.st||mkSt()};
+  });
+  if(!r.langs[r.act])r.act=Object.keys(r.langs)[0]||'fi';
+  return r;
+}
+
+/* ── DATA ── */
+let D={nat:'ru',langs:{},act:'',settings:{noVocabWarn:false,autoTopic:false,lastErrors:[]}};
+function LD(){return D.langs[D.act]||{goal:10,p:{},st:mkSt()};}
+function LP(){return LD().p;}
+function LG(){return LD().goal||10;}
+function LS(){return LD().st;}
+function mkSt(){return{streak:0,last:'',total:0};}
+function mkLang(g){return{goal:g||10,p:{},st:mkSt()};}
+
+/* ── DATES / UTILS ── */
+const todayS=()=>new Date().toISOString().slice(0,10);
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function el(id){return document.getElementById(id);}
+function txt(id,v){const e=el(id);if(e)e.textContent=v;}
+function show(id){document.querySelectorAll('.sc').forEach(x=>x.classList.remove('on'));el(id)?.classList.add('on');}
+
+/* ── COUNTERS ── */
+function countUnseen(){const p=LP();return W.filter(w=>{const e=p[w.id];return !e||(e.box===0&&e.reps===0);}).length;}
+function countLearning(){return Object.values(LP()).filter(e=>e.box>=1&&e.box<=3).length;}
+function countKnown(){return Object.values(LP()).filter(e=>e.box>=4).length;}
+function countDue(){const t=todayS();return W.filter(w=>{const e=LP()[w.id];return e&&e.next&&e.next<=t&&e.lr!==t;}).length;}
+function getAutoCategory(){
+  if(!D.settings?.autoTopic)return null;
+  const p=LP(),today=todayS();
+  let best=null,bestAvail=-1,bestOrd=999;
+  CAT_ORDER.forEach((cat,ord)=>{
+    const ws=W.filter(w=>w.c===cat);
+    const avail=ws.filter(w=>{const e=p[w.id];return !e||(e.next&&e.next<=today&&e.lr!==today);}).length;
+    if(avail>0&&(avail>bestAvail||(avail===bestAvail&&ord<bestOrd))){best=cat;bestAvail=avail;bestOrd=ord;}
+  });
+  return best;
+}
+function buildSession(catFilter){
+  const today=todayS(),goal=LG(),p=LP();
+  const cat=catFilter||getAutoCategory();
+  const src=cat?W.filter(w=>w.c===cat):W;
+  const due=shuffle(src.filter(w=>{const e=p[w.id];return e&&e.reps>0&&e.next&&e.next<=today&&e.lr!==today;}));
+  const b0=shuffle(src.filter(w=>{const e=p[w.id];return e&&e.reps===0&&e.next&&e.next<=today&&e.lr!==today;}));
+  const newW=shuffle(src.filter(w=>!p[w.id]));
+  const dueAll=[...due,...b0];const slots=Math.max(0,goal-dueAll.length);
+  return[...dueAll,...newW.slice(0,slots)].slice(0,goal);
+}
+function getErrorWords(){
+  const p=LP();return W.filter(w=>{const e=p[w.id];return e&&e.bad>=2&&e.box<=3;});
+}
+
+/* ── STREAK ── */
+function updStreak(){
+  const st=LS(),today=todayS();
+  if(st.last===today)return;
+  if(st.last){const d=Math.round((new Date(today)-new Date(st.last))/864e5);st.streak=d===1?(st.streak||0)+1:1;}
+  else st.streak=1;
+  st.last=today;
+}
+
+/* ── ONBOARDING ── */
+let ob_nat='ru',ob_tgt=[],ob_goal=10;
+function pickNat(l){
+  ob_nat=l;D.nat=l;
+  document.querySelectorAll('[id^="lt-"]').forEach(e=>e.classList.remove('sel'));
+  el('lt-'+l)?.classList.add('sel');
+  el('btn-ob1').disabled=false;
+  const ti=ob_tgt.indexOf(l);if(ti!==-1){ob_tgt.splice(ti,1);el('tl-'+l)?.classList.remove('sel');}
+  ['fi','en','uk','ru'].forEach(x=>el('tl-'+x)?.classList.toggle('dim',x===l));
+  localizeOb();
+}
+function pickTgt(l){
+  if(l===ob_nat)return;
+  const i=ob_tgt.indexOf(l);
+  if(i===-1){ob_tgt.push(l);el('tl-'+l)?.classList.add('sel');}
+  else{ob_tgt.splice(i,1);el('tl-'+l)?.classList.remove('sel');}
+  el('btn-ob2').disabled=ob_tgt.length===0;
+}
+function pickGoal(n){
+  ob_goal=n;
+  document.querySelectorAll('[id^="gl-"]').forEach(e=>e.classList.remove('sel'));
+  el('gl-'+n)?.classList.add('sel');
+}
+function goOb(step){
+  document.querySelectorAll('.ob-step').forEach(e=>e.classList.remove('on'));
+  el('ob'+step)?.classList.add('on');
+}
+function localizeOb(){
+  const l=UI[ob_nat]||UI.ru;
+  txt('ob-q',l.nat_lbl+' →' || 'На каком языке вы говорите?');
+}
+function finishOb(){
+  D.nat=ob_nat;D.langs={};
+  ob_tgt.filter(x=>x!==ob_nat).forEach(l=>{D.langs[l]=mkLang(ob_goal);});
+  if(!Object.keys(D.langs).length)D.langs['fi']=mkLang(ob_goal);
+  D.act=Object.keys(D.langs)[0];
+  D.settings={noVocabWarn:false,autoTopic:false,lastErrors:[]};
+  save();renderHome();show('shome');
+}
+
+/* ── HOME ── */
+function renderHome(){
+  const u=u_=s;
+  const tgU=tg?.initDataUnsafe?.user;
+  txt('h-greet',(tgU?.first_name||s('greet')));
+  const now=new Date(),dl=DR[D.nat]?D.nat:'ru';
+  txt('h-date',(DR[dl]||DR.ru)[now.getDay()]+', '+now.getDate()+' '+(MR[dl]||MR.ru)[now.getMonth()]);
+  const streak=LS().streak||0;
+  txt('h-streak',streak>0?'★ '+streak:'');
+  const kn=countKnown(),lrn=countLearning(),total=W.length;
+  const touched=kn+lrn;
+  el('hpb').style.width=(touched?Math.round(touched/total*100):0)+'%';
+  txt('hpb-lbl',kn+' / '+total+' '+s('learned'));
+  txt('hc-new',countUnseen());txt('hc-lrn',lrn);txt('hc-kn',kn);
+  txt('hc-new-l',s('new_w'));txt('hc-lrn-l',s('lrn_w'));txt('hc-kn-l',s('kn_w'));
+  // Lang tabs
+  const lr=el('h-langs');lr.innerHTML='';
+  Object.keys(D.langs).forEach(lang=>{
+    const m=LM[lang]||{f:'',n:lang},btn=document.createElement('button');
+    btn.className='lang-tab'+(lang===D.act?' act':'');
+    btn.textContent=m.n;
+    btn.onclick=()=>{D.act=lang;save();renderHome();};
+    lr.appendChild(btn);
+  });
+  // Start button
+  const words=buildSession(),cnt=words.length;
+  const doneToday=Object.values(LP()).filter(e=>e.lr===todayS()).length;
+  if(cnt>0){
+    txt('start-lbl',s('start'));
+    const sc=el('start-cnt');sc.style.display='';sc.textContent=cnt;
+    el('btn-start').disabled=false;
+    txt('h-next','');
+  }else{
+    txt('start-lbl',doneToday>0?s('done_today'):s('nothing'));
+    el('start-cnt').style.display='none';
+    el('btn-start').disabled=true;
+    const nxt=W.filter(w=>{const e=LP()[w.id];return e&&e.next&&e.next<=addDays(1);}).length;
+    txt('h-next',nxt>0?s('tmrw')+': '+nxt+' '+(D.nat==='en'?'words':'слов'):'');
+  }
+  txt('h-vocab-lbl',s('vocab'));
+  // Errors button
+  const errW=getErrorWords(),errN=errW.length;
+  const errBtn=el('btn-err');
+  errBtn.style.display=errN>0?'flex':'none';
+  if(errN>0){txt('err-lbl',s('err_btn'));txt('err-cnt',errN);}
+}
+function backHome(){clearInterval(ses.timerInt);renderHome();show('shome');}
+
+/* ── SETTINGS ── */
+function openSettings(){renderSettings();show('sset');}
+function _settingsLabels(){
+  const L={
+    ru:{goal:'Слов за раз',topic:'Тема обучения',nat:'Знаю язык',tgt:'Изучаю',act:'Активный',reset:'↺ Сбросить прогресс'},
+    uk:{goal:'Слів за раз',topic:'Тема навчання',nat:'Знаю мову',tgt:'Вивчаю',act:'Активна',reset:'↺ Скинути прогрес'},
+    en:{goal:'Words per session',topic:'Study mode',nat:'I know',tgt:'Learning',act:'Active',reset:'↺ Reset progress'},
+  };
+  const l=L[D.nat]||L.ru;
+  txt('set-lbl-goal',l.goal);txt('set-lbl-topic',l.topic);
+  txt('set-nat-lbl',l.nat);txt('set-tgt-lbl',l.tgt);
+  const actEl=el('set-act-sec');if(actEl)actEl.querySelector('.set-lbl')&&(actEl.querySelector('.set-lbl').textContent=l.act);
+  const danEl=document.querySelector('.set-danger');if(danEl)danEl.textContent=l.reset;
+  // Update topic toggle button texts
+  const tbRnd=el('tb-rnd');if(tbRnd)tbRnd.textContent='↻ '+l.topic_rnd;
+  const tbAuto=el('tb-auto');if(tbAuto)tbAuto.textContent='★ '+l.topic_auto;
+  // Update vocab screen labels
+  txt('vocab-title',l.vocab||'Словарь');
+  txt('h-vocab-lbl',l.vocab||'Словарь');
+}
+function renderSettings(){_settingsLabels();
+  const auto=D.settings?.autoTopic;
+  el('tb-rnd').classList.toggle('act',!auto);
+  el('tb-auto').classList.toggle('act',!!auto);
+  const autoCat=getAutoCategory();
+  txt('topic-now',auto&&autoCat?(s('topic_now')+(CAT_ICONS[autoCat]||'')+' '+autoCat):'');
+  ['fi','en','uk','ru'].forEach(l=>{
+    el('sn-'+l)?.classList.toggle('act',D.nat===l);
+    const t=el('stl-'+l);
+    if(t){t.classList.toggle('act',!!D.langs[l]);t.classList.toggle('dim',l===D.nat);}
+  });
+  [5,10,15,20].forEach(n=>el('sg-'+n)?.classList.toggle('sel',LG()===n));
+  const tabs=el('set-act-tabs');tabs.innerHTML='';
+  Object.keys(D.langs).forEach(l=>{
+    const m=LM[l]||{f:'',n:l},b=document.createElement('button');
+    b.className='sat-btn'+(l===D.act?' act':'');b.textContent=m.n;
+    b.onclick=()=>{D.act=l;save();renderSettings();};tabs.appendChild(b);
+  });
+  el('set-act-sec').style.display=Object.keys(D.langs).length>1?'flex':'none';
+}
+function setTopicMode(v){if(!D.settings)D.settings={};D.settings.autoTopic=v;save();renderSettings();}
+function setGoal(n){if(D.langs[D.act])D.langs[D.act].goal=n;save();renderSettings();}
+function setNat(l){
+  D.nat=l;
+  if(D.langs[l]&&Object.keys(D.langs).length>1){delete D.langs[l];if(D.act===l)D.act=Object.keys(D.langs)[0];}
+  save();renderSettings();
+}
+function togTgt(l){
+  if(l===D.nat)return;
+  if(D.langs[l]){if(Object.keys(D.langs).length<=1)return;delete D.langs[l];if(D.act===l)D.act=Object.keys(D.langs)[0];}
+  else D.langs[l]=mkLang(LG());
+  save();renderSettings();
+}
+function confirmReset(){el('reset-dlg').style.display='flex';}
+function doReset(){D.langs[D.act]={...D.langs[D.act],p:{},st:mkSt()};save();el('reset-dlg').style.display='none';renderSettings();}
+
+/* ── VOCABULARY ── */
+let vFilter='all',vCat='all',vSrch='',pendingVId=null;
+function openVocab(){vFilter='all';vCat='all';vSrch='';if(el('vocab-srch'))el('vocab-srch').value='';renderVocab();show('svocab');}
+function setVF(f){vFilter=f;renderVocab();}
+function renderVocab(){
+  ['all','new','kn'].forEach(f=>el('vf-'+f)?.classList.toggle('act',vFilter===(f==='kn'?'known':f)));
+  const cats=['all',...new Set(W.map(w=>w.c))];
+  const ce=el('vocab-cats');ce.innerHTML='';
+  cats.forEach(c=>{
+    const b=document.createElement('button');b.className='cat-btn'+(vCat===c?' act':'');
+    b.textContent=c==='all'?'Все':c;b.onclick=()=>{vCat=c;renderVocab();};ce.appendChild(b);
+  });
+  const p=LP(),nat=D.nat,act=D.act;
+  const words=W.filter(w=>{
+    if(vSrch){const q=vSrch.toLowerCase();const _all=[w.ru,w.fi,w.en,w.uk].filter(Boolean).join(' ').toLowerCase();if(!_all.includes(q))return false;}
+    if(vCat!=='all'&&w.c!==vCat)return false;
+    const e=p[w.id];
+    if(vFilter==='new')return !e||e.box===0;
+    if(vFilter==='known')return e&&e.box>=4;
+    return true;
+  });
+  txt('vocab-cnt',words.length+(D.nat==='en'?' words':' слов'));
+  const groups={};words.forEach(w=>{if(!groups[w.c])groups[w.c]=[];groups[w.c].push(w);});
+  const cont=el('vocab-list');cont.innerHTML='';
+  if(!words.length){cont.innerHTML='<div class="vocab-empty">—</div>';return;}
+  Object.entries(groups).forEach(([cat,ws])=>{
+    const allKn=ws.every(w=>p[w.id]&&p[w.id].box>=4);
+    const hdr=document.createElement('div');hdr.className='vocab-cat-hdr';
+    hdr.innerHTML='<span class="vch-t">'+cat+' <span class="vch-c">'+ws.length+'</span></span>'
+      +'<label class="cat-chk-wrap"><input type="checkbox"'+(allKn?' checked':'')+'><span class="cat-chk-lbl">✓ Всю</span></label>';
+    const cb=hdr.querySelector('input');
+    cb.onchange=function(){
+      if(this.checked){const ids=ws.filter(w=>!p[w.id]||p[w.id].box===0).map(w=>w.id);ids.forEach(id=>markKnown(id,true,true));save();}
+      else{ws.forEach(w=>markKnown(w.id,false,true));save();}
+      renderVocab();
+    };
+    cont.appendChild(hdr);
+    ws.forEach(w=>{
+      const e=p[w.id],isKn=e&&e.box>=4;
+      const row=document.createElement('div');row.className='vi-row';
+      row.innerHTML='<span class="vi-word">'+(w[nat]||w.ru)+'</span>'
+        +'<span class="vi-eq">=</span><span class="vi-tr">'+(w[act]||'—')+'</span>'
+        +'<input type="checkbox" class="vi-chk"'+(isKn?' checked':'')+' data-id="'+w.id+'">';
+      const input=row.querySelector('input');
+      input.onchange=function(){
+        if(this.checked){if(!D.settings?.noVocabWarn){pendingVId=+this.dataset.id;el('vocab-warn').style.display='flex';}
+        else{markKnown(+this.dataset.id,true);renderVocab();}}
+        else{markKnown(+this.dataset.id,false);renderVocab();}
+      };
+      cont.appendChild(row);
+    });
+  });
+}
+function markKnown(id,known,skip){const p=LP(),t=todayS();
+  if(known)p[id]={box:4,reps:4,ef:2.5,interval:30,next:addDays(30),lr:t,ok:1,bad:0};
+  else delete p[id];
+  if(!skip)save();
+}
+function warnOk(always){el('vocab-warn').style.display='none';
+  if(always){if(!D.settings)D.settings={};D.settings.noVocabWarn=true;save();}
+  if(pendingVId!==null){markKnown(pendingVId,true);pendingVId=null;}
+  renderVocab();
+}
+function warnNo(){el('vocab-warn').style.display='none';pendingVId=null;renderVocab();}
+
+/* ── SESSION ── */
+let ses={allW:[],acqW:[],acqI:0,mcqQ:[],results:{},retries:{},phase:'',ok:[],bad:[],timerInt:null};
+
+function startSession(catFilter){
+  const words=buildSession(catFilter||null);
+  if(!words.length){const d=Object.values(LP()).filter(e=>e.lr===todayS()).length;
+    alert(d>0?s('done_today'):s('nothing'));return;}
+  const p=LP();
+  ses={allW:words,acqW:words.filter(w=>!p[w.id]),acqI:0,mcqQ:[],results:{},retries:{},phase:'',ok:[],bad:[],timerInt:null};
+  if(ses.acqW.length>0){ses.phase='acq';_showAcq(ses.acqW[0]);show('sacq');}
+  else _beginStudy();
+}
+function startErrors(){
+  const words=getErrorWords();if(!words.length)return;
+  ses={allW:shuffle([...words]),acqW:[],acqI:0,mcqQ:[],results:{},retries:{},phase:'',ok:[],bad:[],timerInt:null};
+  if(!D.settings)D.settings={};D.settings.lastErrors=[];save();
+  _beginStudy();
+}
+
+/* ACQ */
+function _showAcq(w){
+  const done=ses.acqI,total=ses.acqW.length;
+  el('acq-fill').style.width=(done/total*100)+'%';txt('acq-cnt',(done+1)+'/'+total);
+  txt('acq-cat',w.c);txt('acq-nat',w[D.nat]||w.ru);txt('acq-act',w[D.act]||'—');
+  el('acq-flag-n').textContent=lflag(D.nat);el('acq-flag-a').textContent=lflag(D.act);
+  txt('acq-btn',s('understood'));
+}
+function acqNext(){
+  ses.acqI++;
+  if(ses.acqI<ses.acqW.length){_showAcq(ses.acqW[ses.acqI]);}
+  else _beginStudy();
+}
+
+/* STUDY: routes each word by box */
+function _beginStudy(){
+  ses.phase='study';
+  const p=LP();
+  const old=shuffle(ses.allW.filter(w=>p[w.id]&&p[w.id].reps>0));
+  const nw=shuffle(ses.allW.filter(w=>!p[w.id]||p[w.id].reps===0));
+  ses.mcqQ=[...old,...nw];
+  _nextCard();
+}
+function _nextCard(){
+  clearInterval(ses.timerInt);
+  if(!ses.mcqQ.length){_endSession();return;}
+  const w=ses.mcqQ[0];
+  const e=LP()[w.id],box=e?e.box:0;
+  const total=ses.allW.length,rem=ses.mcqQ.length;
+  const pct=((total-rem)/total*100)+'%';
+  // Update all progress bars
+  ['mcq-fill','sp-fill'].forEach(id=>{const el_=el(id);if(el_)el_.style.width=pct;});
+  ['mcq-cnt','sp-cnt'].forEach(id=>{txt(id,rem+' '+(D.nat==='en'?'left':'осталось'));});
+  _showMCQ(w); // spell mode disabled — MCQ only
+}
+
+/* MCQ */
+function _showMCQ(w){
+  const toTgt=Math.random()<0.5;
+  const q=toTgt?(w[D.nat]||w.ru):(w[D.act]||'—');
+  const correct=toTgt?(w[D.act]||'—'):(w[D.nat]||w.ru);
+  const wrong=shuffle(W.filter(x=>x.id!==w.id&&x[toTgt?D.act:D.nat])).slice(0,3).map(x=>x[toTgt?D.act:D.nat]||'—');
+  const choices=shuffle([correct,...wrong]);
+  txt('mcq-dir',toTgt?s('q_to').replace('{l}',lname(D.act)):s('q_from'));
+  txt('mcq-q',q);txt('mcq-badge',lflag(D.act));
+  const cont=el('mcq-choices');cont.innerHTML='';delete cont.dataset.done;
+  choices.forEach(ch=>{
+    const btn=document.createElement('button');btn.className='mcq-btn';btn.textContent=ch;
+    btn.onclick=()=>_handleMCQ(w,ch===correct,btn,cont,correct);
+    cont.appendChild(btn);
+  });
+  _startTimer(w,correct,cont);
+  show('smcq');
+}
+function _handleMCQ(w,correct,btn,cont,ca){
+  if(cont.dataset.done)return;
+  cont.dataset.done='1';clearInterval(ses.timerInt);
+  el('timer-fill').style.transition='none';el('timer-fill').style.width='0%';
+  btn.classList.add(correct?'ok':'no');
+  if(!correct)cont.querySelectorAll('.mcq-btn').forEach(b=>{if(b.textContent===ca)b.classList.add('ok');});
+  _recordResult(w,correct);
+  setTimeout(_nextCard,correct?500:900);
+}
+function _startTimer(w,ca,cont){
+  el('timer-fill').style.transition='none';el('timer-fill').style.width='100%';
+  void el('timer-fill').offsetWidth;
+  el('timer-fill').style.transition='width 5s linear';el('timer-fill').style.width='0%';
+  clearInterval(ses.timerInt);let ms=5000;
+  ses.timerInt=setInterval(()=>{
+    ms-=100;
+    if(ms<=0){
+      clearInterval(ses.timerInt);
+      if(!cont.dataset.done){
+        cont.dataset.done='1';
+        cont.querySelectorAll('.mcq-btn').forEach(b=>{if(b.textContent===ca)b.classList.add('ok');});
+        _recordResult(w,false);setTimeout(_nextCard,900);
+      }
+    }
+  },100);
+}
+
+/* SPELL */
+let sp={word:null,target:'',letters:[],slots:[],mistakes:0};
+function _showSpell(w){
+  document.activeElement?.blur();
+  const target=(w[D.act]||'').toLowerCase().trim().replace(/[().\\/,;]/g,'').split(' ')[0];
+  if(!target||target==='—'){ses.mcqQ.shift();ses.results[w.id]='ok';ses.ok.push(w);updProg(w.id,true);_nextCard();return;}
+  sp.word=w;sp.target=target;sp.slots=new Array(target.length).fill(null);sp.mistakes=0;
+  const tChars=target.split('');
+  const alpha=ALPHA[D.act]||ALPHA.fi;
+  const extras=[];let tries=0;const ec=Math.min(4,Math.max(2,Math.floor(target.length*0.5)));
+  while(extras.length<ec&&tries<60){const l=alpha[Math.floor(Math.random()*alpha.length)];if(!tChars.includes(l)&&!extras.includes(l))extras.push(l);tries++;}
+  sp.letters=shuffle([...tChars.map(c=>({c,used:false})),...extras.map(c=>({c,used:false}))]);
+  txt('sp-cat',w.c);txt('sp-nat',w[D.nat]||w.ru);txt('sp-hint','');
+  _renderSpell();show('sspell');
+}
+function _renderSpell(){
+  const sEl=el('sp-slots');sEl.className='spell-slots';sEl.innerHTML='';
+  sp.slots.forEach((ch,i)=>{
+    const d=document.createElement('div');d.className='spell-slot'+(ch?' filled':'');d.textContent=ch||'';
+    if(ch)d.onclick=()=>_retLetter(i);sEl.appendChild(d);
+  });
+  const tEl=el('sp-tiles');tEl.innerHTML='';
+  sp.letters.forEach((lt,i)=>{
+    const b=document.createElement('button');b.className='spell-tile'+(lt.used?' used':'');b.textContent=lt.c;
+    b.setAttribute('inputmode','none');b.setAttribute('tabindex','-1');
+    if(!lt.used)b.onclick=()=>_putLetter(i);tEl.appendChild(b);
+  });
+}
+function _putLetter(i){
+  const slot=sp.slots.indexOf(null);if(slot===-1)return;
+  sp.letters[i].used=true;sp.slots[slot]=sp.letters[i].c;
+  if(!sp.slots.includes(null))_checkSpell();else _renderSpell();
+}
+function _retLetter(i){
+  const ch=sp.slots[i];if(!ch)return;
+  sp.slots[i]=null;
+  const t=sp.letters.find(x=>x.used&&x.c===ch);if(t)t.used=false;
+  _renderSpell();
+}
+function _checkSpell(){
+  const ok=sp.slots.join('')===sp.target;
+  if(ok){
+    el('sp-slots').querySelectorAll('.spell-slot').forEach(d=>d.classList.add('win'));
+    setTimeout(()=>{_recordResult(sp.word,true);setTimeout(_nextCard,100);},600);
+  }else{
+    sp.mistakes++;
+    el('sp-slots').classList.add('shake');
+    setTimeout(()=>{
+      sp.slots=new Array(sp.target.length).fill(null);sp.letters.forEach(t=>t.used=false);
+      if(sp.mistakes>=3){
+        txt('sp-hint','→ '+sp.target);
+        setTimeout(()=>{
+          _recordResult(sp.word,false);
+          _nextCard();
+        },1500);
+      }else _renderSpell();
+    },400);
+  }
+}
+
+/* RESULT HELPER */
+function _recordResult(w,correct){
+  ses.mcqQ.shift(); // remove from front
+  if(correct){
+    ses.results[w.id]='ok';ses.ok.push(w);
+  }else{
+    if(ses.results[w.id]!=='ok'){ses.results[w.id]='bad';ses.bad.push(w);}
+    ses.retries[w.id]=(ses.retries[w.id]||0)+1;
+    if((ses.retries[w.id]||0)<3)ses.mcqQ.push(w); // retry max 3 times
+  }
+}
+function updProg(id,correct){
+  const p=LP(),today=todayS();
+  let e=p[id]||{box:0,reps:0,ef:2.5,interval:1,next:null,lr:'',ok:0,bad:0};
+  if(correct){e.ok++;if(e.lr!==today){e.reps++;e.interval=e.reps<=1?1:e.reps<=2?3:e.reps<=3?7:30;e.box=Math.min(4,e.reps);}e.lr=today;e.next=addDays(e.interval||1);}
+  else{e.bad++;e.lr=today;e.next=addDays(1);}
+  p[id]=e;
+}
+
+/* END SESSION */
+function _endSession(){
+  clearInterval(ses.timerInt);
+  const today=todayS(),p=LP();
+  ses.allW.forEach(w=>{
+    const res=ses.results[w.id];if(!res)return;
+    updProg(w.id,res==='ok');
+  });
+  if(!D.settings)D.settings={};
+  D.settings.lastErrors=[...new Set(ses.bad.map(w=>w.id))];
+  updStreak();save();
+  _showDone();
+}
+function _showDone(){
+  const okW=ses.allW.filter(w=>ses.results[w.id]==='ok');
+  const badW=ses.allW.filter(w=>ses.results[w.id]==='bad');
+  const total=ses.allW.length,pct=total?Math.round(okW.length/total*100):0;
+  txt('done-ok-n',okW.length);txt('done-no-n',badW.length);
+  const gi=Math.min(4,Math.floor(pct/25));
+  const grades=s('grades');
+  txt('done-em',['💪','😊','👍','🎉','🏆'][gi]);
+  txt('done-h',grades[gi]);txt('done-sub',okW.length+s('of')+total+' ('+pct+'%)');
+  // Hardest word
+  const bc={};ses.bad.forEach(w=>bc[w.id]=(bc[w.id]||0)+1);
+  const hid=Object.keys(bc).sort((a,b)=>bc[b]-bc[a])[0];
+  const hw=hid?W.find(w=>w.id===+hid):null;
+  const hEl=el('done-hard');
+  if(hEl){if(hw&&(bc[hw.id]||0)>=2){hEl.textContent='💡 '+s('remember')+(hw[D.act]||'—')+' = '+(hw[D.nat]||hw.ru);hEl.style.display='';}else hEl.style.display='none';}
+  const okL=el('done-ok-list');
+  okL.innerHTML=okW.slice(0,16).map(w=>'<span class="done-word">'+(w[D.nat]||w.ru)+'</span>').join('');
+  if(okW.length>16)okL.innerHTML+='<span class="done-word">+'+(okW.length-16)+'</span>';
+  el('done-ok-sec').style.display=okW.length?'':'none';
+  const noL=el('done-no-list');
+  noL.innerHTML=badW.map(w=>'<div class="done-err"><span class="er">'+(w[D.nat]||w.ru)+'</span><span class="ea">→</span><span class="et">'+(w[D.act]||'—')+'</span></div>').join('');
+  el('done-no-sec').style.display=badW.length?'':'none';
+  show('sdone');
+}
+
+/* ── INIT ── */
+load(saved=>{
+  const tgLang=tg?.initDataUnsafe?.user?.language_code||'';
+  const defNat=tgLang.startsWith('uk')?'uk':'ru';
+  if(saved&&saved.langs&&saved.act){
+    D=saved;
+    if(!D.settings)D.settings={noVocabWarn:false,autoTopic:false,lastErrors:[]};
+    if(!D.langs[D.act])D.act=Object.keys(D.langs)[0]||'fi';
+    renderHome();show('shome');
+  }else if(saved&&(saved.langs||saved.nat)){
+    D.nat=saved.nat||defNat;D.langs={};
+    const tgts=Object.keys(saved.langs||{fi:1});
+    tgts.forEach((l,i)=>{const ol=saved.langs?.[l]||{};const lp=i===0&&!saved.langs?(saved.p||{}):{...ol.p||{}};
+      D.langs[l]={goal:ol.goal||10,p:lp,st:{...mkSt(),...(ol.st||{})}};});
+    if(!Object.keys(D.langs).length)D.langs['fi']=mkLang(10);
+    D.act=Object.keys(D.langs)[0];
+    D.settings={noVocabWarn:false,autoTopic:false,lastErrors:[]};
+    localStorage.removeItem('hw_v5');save();renderHome();show('shome');
+  }else{D.nat=defNat;ob_nat=defNat;show('sob');}
+});
+</script></body></html>
